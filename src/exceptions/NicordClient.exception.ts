@@ -5,7 +5,7 @@
 export class NicordClientException extends Error {
 
   constructor(reason: string) {
-    super(`NicordClientException: ${reason}`)
+    super(`${reason}`)
     this._reason = reason
   }
 

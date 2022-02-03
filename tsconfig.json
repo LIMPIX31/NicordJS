@@ -6,7 +6,12 @@
     "outDir": "./lib",
     "strict": true,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "noImplicitAny": false,
+    "types": [
+      "jest",
+      "reflect-metadata"
+    ]
   },
   "include": [
     "src"

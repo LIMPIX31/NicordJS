@@ -11,17 +11,18 @@
     "lib/**/*"
   ],
   "scripts": {
-    "start": "ts-node examples/index.ts",
+    "start": "ts-node src/examples/index.ts",
     "test": "jest --config jestconfig.json",
     "build": "tsc",
     "format": "prettier --write \"src/**/*.ts\"",
-    "lint": "tslint -p tsconfig.json",
-    "prepare": "npm run build",
-    "prepublishOnly": "npm test && npm run lint",
-    "preversion": "npm run lint",
-    "version": "npm run format && git add -A src",
+    "prepare": "yarn build",
+    "prepublishOnly": "yarn test",
+    "version": "yarn format && git add -A src",
     "postversion": "git push && git push --tags"
   },
+  "exports": [
+    "lib/index.js"
+  ],
   "keywords": [
     "Discord",
     "Bot",

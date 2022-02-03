@@ -1,12 +1,33 @@
-import { NicordClient as INicordClient } from '../types/interfaces/NicordClient'
 import { Client, Intents } from 'discord.js'
 import { IntentsFlags } from './IntentsFlags'
 import { NicordClientException } from '../exceptions/NicordClient.exception'
+import { CommandListener } from '../types/interfaces/CommandListener'
+import { NicordTools } from './NicordTools'
+import {
+  NicordMiddleware,
+  NicordMiddlewareFunction,
+  NicordMiddlewareParmas,
+  NicordMiddlewareType,
+} from '../types/interfaces/NicordMiddleware'
+import { NicordMessage } from './NicordMessage'
+import { CommandPipeline } from './command/CommandPipeline'
+import { REST } from '@discordjs/rest'
+import { SlashCommandAutoBuilder } from './command/SlashCommandAutoBuilder'
+import { Routes } from 'discord-api-types/v9'
+import { NicordCommandInteraction } from './interaction/NicordCommandInteraction'
 
-export class NicordClient extends Client implements INicordClient {
+/**
+ * <h1>NicordClient</h1>
+ * And don't forget {@link IntentsFlags.GUILD_MESSAGES} to respond to participants' messages
+ */
+export class NicordClient extends Client {
 
   private nToken: string | undefined
   private started: boolean = false
+  private commandListeners: CommandListener[] = []
+  private middlewares: NicordMiddleware[] = []
+  private nrest: REST = new REST({ version: '9' })
+  private slashCommands: any = []
 
   constructor(flags: IntentsFlags[]) {
     super({
@@ -14,6 +35,12 @@ export class NicordClient extends Client implements INicordClient {
         flags.map(flag => Intents.FLAGS[flag]),
       ],
     })
+  }
+
+  private _clientId: string | undefined
+
+  set clientId(clientId: string) {
+    this._clientId = clientId
   }
 
   get isNotStarted(): boolean {
@@ -35,6 +62,7 @@ export class NicordClient extends Client implements INicordClient {
   setToken(token: string): void {
     if (this.isNotStarted) {
       this.nToken = token
+      this.nrest.setToken(token)
     } else {
       throw new NicordClientException('The token must be assigned to the client before starting')
     }
@@ -43,11 +71,84 @@ export class NicordClient extends Client implements INicordClient {
   async start(onReady?: () => void): Promise<void> {
     if (this.hasToken) {
       await this.login(this.nToken)
+      this.setupEventListeners()
+      await this.nrest.put(Routes.applicationCommands(this?.user?.id || this?._clientId || ''), {
+        body: this.slashCommands,
+      })
       onReady && onReady()
     } else {
       throw new NicordClientException('You need to assign a token before running the client')
     }
   }
 
+  addCommandListener(Listener: CommandListener) {
+    if (!NicordTools.isCommandListener(Listener))
+      throw this.invalidCommandListenerException()
+    this.commandListeners.push(Listener)
+    if (NicordTools.isSlashListener(Listener)) {
+      this.slashCommands.push(...SlashCommandAutoBuilder.createSlashCommands(Listener))
+    }
+  }
+
+  removeCommandListener(Listener: CommandListener) {
+    if (NicordTools.isCommandListener(Listener)) {
+      this.commandListeners = this.commandListeners.filter(l => l !== Listener)
+    } else {
+      throw this.invalidCommandListenerException()
+    }
+  }
+
+  hasListener(Listener: CommandListener): boolean {
+    if (NicordTools.isCommandListener(Listener)) {
+      return this.commandListeners.includes(Listener)
+    } else {
+      throw this.invalidCommandListenerException()
+    }
+  }
+
+  useMiddleware(type: NicordMiddlewareType, middleware: NicordMiddlewareFunction) {
+    this.middlewares.push({
+      type,
+      middleware,
+    })
+  }
+
+  private setupEventListeners(): void {
+    this.on('messageCreate', async (message) => {
+      let msg = NicordMessage.from(message)
+      msg = await this.runMiddlewares('message', msg) as NicordMessage
+      if (msg.author.id !== this.user?.id) {
+        for (const listener of this.commandListeners) {
+          if (!NicordTools.isSlashListener(listener)) {
+            await CommandPipeline.legacyCommand(msg, listener)
+          }
+        }
+      }
+    })
+    this.on('interactionCreate', async (interaction) => {
+      if(interaction.isCommand()){
+        let cmd = NicordCommandInteraction.from(interaction)
+        cmd = await this.runMiddlewares('command', cmd) as NicordCommandInteraction
+        for (const listener of this.commandListeners) {
+          if (NicordTools.isSlashListener(listener)) {
+            await CommandPipeline.slashCommand(cmd, listener)
+          }
+        }
+      }
+    })
+  }
+
+  private async runMiddlewares(type: NicordMiddlewareType, value: NicordMiddlewareParmas): Promise<NicordMiddlewareParmas>{
+    for (const mw of this.middlewares) {
+      if (mw.type === type){
+        value = await mw.middleware(value)
+      }
+    }
+    return value
+  }
+
+  private invalidCommandListenerException() {
+    return new NicordClientException('Value must be valid command listener. Check if you are using the right decorator.')
+  }
 
 }
