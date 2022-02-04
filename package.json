@@ -1,7 +1,7 @@
 {
   "name": "nicordjs",
   "version": "1.0.0",
-  "description": "Framework for creating modern discord bots",
+  "description": "Library for creating modern discord bots",
   "repository": "https://github.com/LIMPIX31/NicordJS.git",
   "author": "LIMPIX31",
   "license": "MIT",
