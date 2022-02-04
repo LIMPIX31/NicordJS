@@ -1,16 +1,16 @@
 import {
+  ButtonRowComponent,
   CommandHandler,
   Description,
   IntentsFlags,
   Name,
+  NicordButton,
   NicordClient,
+  NicordSlashCommand,
   NumberOption,
   SlashCommandListener,
   Subcommands,
 } from '../index'
-import { NicordSlashCommand } from '../nicord/command/NicordSlashCommand'
-import { ButtonRowComponent } from '../nicord/ButtonRowComponent'
-import { NicordButton } from '../nicord/NicordButton'
 
 const client = new NicordClient([
   IntentsFlags.GUILDS,
@@ -71,7 +71,7 @@ class SlashCommands {
     await cmd.reply({
       content: 'Click on button',
       components: [new ButtonRowComponent(
-        new NicordButton('clickme', 'Нажми бобёр', 'PRIMARY')
+        new NicordButton('clickme', 'Нажми бобёр', 'PRIMARY'),
       )],
     })
   }

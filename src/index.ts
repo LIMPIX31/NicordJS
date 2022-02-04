@@ -26,6 +26,15 @@ import { IntentsFlags } from './nicord/client/IntentsFlags'
 import { NicordClient } from './nicord/client/NicordClient'
 import { NicordMessage } from './nicord/NicordMessage'
 import { NicordPermissions } from './nicord/client/NicordPermissions'
+import { NicordSlashCommand } from './nicord/command/NicordSlashCommand'
+import { ButtonRowComponent } from './nicord/ButtonRowComponent'
+import { NicordButton } from './nicord/NicordButton'
+import { NicordButtonInteraction } from './nicord/interaction/NicordButtonInteraction'
+import { NicordCommandInteraction } from './nicord/interaction/NicordCommandInteraction'
+import { NicordInteraction } from './nicord/interaction/NicordInteraction'
+import { NicordRepliableInteraction } from './nicord/interaction/NicordRepliableInteraction'
+import { CommandListener } from './types/CommandListener'
+import { NicordMiddleware } from './types/NicordMiddleware'
 
 export * from 'discord.js'
 
@@ -56,4 +65,13 @@ export {
   RoleOption,
   MentionableOption,
   NumberOption,
+  NicordSlashCommand,
+  ButtonRowComponent,
+  NicordButton,
+  NicordButtonInteraction,
+  NicordCommandInteraction,
+  NicordInteraction,
+  NicordRepliableInteraction,
+  CommandListener,
+  NicordMiddleware,
 }
