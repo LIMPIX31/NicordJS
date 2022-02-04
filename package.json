@@ -21,7 +21,7 @@
     "postversion": "git push && git push --tags"
   },
   "exports": [
-    "lib/index.js"
+    "./index.js"
   ],
   "keywords": [
     "Discord",
