@@ -7,6 +7,7 @@ import {
   NicordButton,
   NicordClient,
   NicordCommandError,
+  NicordMessage,
   NicordSlashCommand,
   NumberOption,
   SlashCommandListener,
@@ -27,6 +28,11 @@ client.localSlashCommands()
 
 client.start(() => {
   console.log('Started!')
+})
+
+client.useMiddleware('message', (entity) => {
+  console.log((entity as NicordMessage).content)
+  return entity
 })
 
 @SlashCommandListener
