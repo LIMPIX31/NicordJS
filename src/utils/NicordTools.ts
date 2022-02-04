@@ -1,6 +1,6 @@
-import { CommandListener } from '../types/interfaces/CommandListener'
+import { CommandListener } from '../types/CommandListener'
 import 'reflect-metadata'
-import { MetadataKeys } from '../utils/MetadataKeys'
+import { MetadataKeys } from './MetadataKeys'
 
 export abstract class NicordTools {
   static isCommandListener(Listener: CommandListener) {

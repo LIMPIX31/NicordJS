@@ -14,7 +14,7 @@ import {
   TextBasedChannel,
   User,
 } from 'discord.js'
-import { OriginalShadow } from './OriginalShadow'
+import { OriginalShadow } from '../utils/OriginalShadow'
 
 export class NicordMessage extends OriginalShadow<Message> {
 

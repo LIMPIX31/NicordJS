@@ -1,7 +1,7 @@
 import { NicordClientException } from '../../exceptions/NicordClient.exception'
 import { NicordCommandHandler } from './NicordCommandHandler'
-import { NicordTools } from '../NicordTools'
-import { CommandListener } from '../../types/interfaces/CommandListener'
+import { NicordTools } from '../../utils/NicordTools'
+import { CommandListener } from '../../types/CommandListener'
 import { NicordCommandInteraction } from '../interaction/NicordCommandInteraction'
 import { NicordMessage } from '../NicordMessage'
 

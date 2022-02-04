@@ -1,13 +1,13 @@
 import { CommandOptions, SlashCommandField } from './decorators/CommandHandler'
 import { MetadataKeys } from '../../utils/MetadataKeys'
-import { NicordTools } from '../NicordTools'
+import { NicordTools } from '../../utils/NicordTools'
 import { NicordClientException } from '../../exceptions/NicordClient.exception'
 import { NicordLegacyCommand } from './NicordLegacyCommand'
 import { GuildMemberRoleManager, Permissions } from 'discord.js'
-import { CommandListener } from '../../types/interfaces/CommandListener'
+import { CommandListener } from '../../types/CommandListener'
 import { NicordMessage } from '../NicordMessage'
 import { NicordCommandInteraction } from '../interaction/NicordCommandInteraction'
-import { NicordPermissions } from '../NicordPermissions'
+import { NicordPermissions } from '../client/NicordPermissions'
 import { NicordSlashCommand } from './NicordSlashCommand'
 
 export class NicordCommandHandler {

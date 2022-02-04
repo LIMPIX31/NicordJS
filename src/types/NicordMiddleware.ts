@@ -1,5 +1,5 @@
-import { NicordMessage } from '../../nicord/NicordMessage'
-import { NicordCommandInteraction } from '../../nicord/interaction/NicordCommandInteraction'
+import { NicordMessage } from '../nicord/NicordMessage'
+import { NicordCommandInteraction } from '../nicord/interaction/NicordCommandInteraction'
 
 export type NicordMiddlewareType = 'message' | 'interaction' | 'command'
 export type NicordMiddlewareParmas = NicordMessage | NicordCommandInteraction

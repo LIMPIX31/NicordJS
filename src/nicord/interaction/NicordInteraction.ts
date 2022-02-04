@@ -1,6 +1,6 @@
 import { Guild, GuildMember, Interaction, User } from 'discord.js'
 import { APIInteractionGuildMember } from 'discord-api-types'
-import { OriginalShadow } from '../OriginalShadow'
+import { OriginalShadow } from '../../utils/OriginalShadow'
 
 export abstract class NicordInteraction<T extends Interaction> extends OriginalShadow<T> {
   get user(): User {

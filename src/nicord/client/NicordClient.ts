@@ -1,20 +1,20 @@
 import { ButtonInteraction, Client, Intents } from 'discord.js'
 import { IntentsFlags } from './IntentsFlags'
-import { NicordClientException } from '../exceptions/NicordClient.exception'
-import { CommandListener } from '../types/interfaces/CommandListener'
-import { NicordTools } from './NicordTools'
+import { NicordClientException } from '../../exceptions/NicordClient.exception'
+import { CommandListener } from '../../types/CommandListener'
+import { NicordTools } from '../../utils/NicordTools'
 import {
   NicordMiddleware,
   NicordMiddlewareFunction,
   NicordMiddlewareParmas,
   NicordMiddlewareType,
-} from '../types/interfaces/NicordMiddleware'
-import { NicordMessage } from './NicordMessage'
-import { CommandPipeline } from './command/CommandPipeline'
+} from '../../types/NicordMiddleware'
+import { NicordMessage } from '../NicordMessage'
+import { CommandPipeline } from '../command/CommandPipeline'
 import { REST } from '@discordjs/rest'
-import { SlashCommandAutoBuilder } from './command/SlashCommandAutoBuilder'
+import { SlashCommandAutoBuilder } from '../command/SlashCommandAutoBuilder'
 import { Routes } from 'discord-api-types/v9'
-import { NicordCommandInteraction } from './interaction/NicordCommandInteraction'
+import { NicordCommandInteraction } from '../interaction/NicordCommandInteraction'
 
 /**
  * <h1>NicordClient</h1>

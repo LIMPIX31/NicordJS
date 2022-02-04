@@ -22,10 +22,10 @@ import {
 import { LegacyCommandListener } from './nicord/command/decorators/LegacyCommandListener'
 import { SlashCommandListener } from './nicord/command/decorators/SlashCommandListener'
 import { NicordLegacyCommand } from './nicord/command/NicordLegacyCommand'
-import { IntentsFlags } from './nicord/IntentsFlags'
-import { NicordClient } from './nicord/NicordClient'
+import { IntentsFlags } from './nicord/client/IntentsFlags'
+import { NicordClient } from './nicord/client/NicordClient'
 import { NicordMessage } from './nicord/NicordMessage'
-import { NicordPermissions } from './nicord/NicordPermissions'
+import { NicordPermissions } from './nicord/client/NicordPermissions'
 
 export * from 'discord.js'
 

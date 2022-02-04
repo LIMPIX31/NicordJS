@@ -13,8 +13,8 @@ import {
   SlashCommandSubcommandBuilder,
   SlashCommandUserOption,
 } from '@discordjs/builders'
-import { CommandListener } from '../../types/interfaces/CommandListener'
-import { NicordTools } from '../NicordTools'
+import { CommandListener } from '../../types/CommandListener'
+import { NicordTools } from '../../utils/NicordTools'
 import { NicordClientException } from '../../exceptions/NicordClient.exception'
 import { NicordCommandHandler } from './NicordCommandHandler'
 

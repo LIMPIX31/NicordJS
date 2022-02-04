@@ -1,6 +1,6 @@
 import { MetadataKeys } from '../../../utils/MetadataKeys'
-import { NicordPermissions } from '../../NicordPermissions'
-import { CommandListener } from '../../../types/interfaces/CommandListener'
+import { NicordPermissions } from '../../client/NicordPermissions'
+import { CommandListener } from '../../../types/CommandListener'
 
 export type SlashCommandField<C = unknown, T = unknown> = {
   type?: T
