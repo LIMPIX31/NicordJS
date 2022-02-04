@@ -5,9 +5,9 @@ Modern library for create simple discord bots based on DiscordJS
 ## Installing
 
 ```bash
-npm i NicordJS --save
-yarn add NicordJS
-pnpm add NicordJS
+npm i nicord.js --save
+yarn add nicord.js
+pnpm add nicord.js
 ```
 
 ## Simple Example
