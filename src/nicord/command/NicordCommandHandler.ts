@@ -11,7 +11,8 @@ import { NicordPermissions } from '../NicordPermissions'
 import { NicordSlashCommand } from './NicordSlashCommand'
 
 export class NicordCommandHandler {
-  constructor(private fn: Function, private options: CommandOptions) {}
+  constructor(private fn: Function, private options: CommandOptions) {
+  }
 
   get prefix(): string {
     return this.options.prefix || '!'

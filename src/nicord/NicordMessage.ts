@@ -14,17 +14,9 @@ import {
   TextBasedChannel,
   User,
 } from 'discord.js'
+import { OriginalShadow } from './OriginalShadow'
 
-export class NicordMessage {
-  private readonly _original: Message
-
-  protected constructor(original: Message) {
-    this._original = original
-  }
-
-  get original(): Message {
-    return this._original
-  }
+export class NicordMessage extends OriginalShadow<Message> {
 
   get author(): User {
     return this.original.author
