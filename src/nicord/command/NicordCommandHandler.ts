@@ -122,6 +122,7 @@ export class NicordCommandHandler {
       }
     } else if (entity instanceof NicordCommandInteraction) {
       const cmd = entity
+      console.log(this.fullCommandName, cmd.fullCommandName)
       if (await this.executableFor(cmd) && this.fullCommandName === cmd.fullCommandName) {
         await this.fn(new NicordSlashCommand(cmd))
       }

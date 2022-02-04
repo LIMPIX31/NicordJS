@@ -22,12 +22,13 @@ export abstract class CommandPipeline {
     console.log(cmd.original, cmd.commandName)
     const handlers = NicordCommandHandler.fromListener(Listener)
     for (const handler of handlers) {
-      if(handler.subcommands){
-        for(const subhandler of NicordCommandHandler.fromListener(handler.subcommands)){
+      if (handler.subcommands) {
+        for (const subhandler of NicordCommandHandler.fromListener(handler.subcommands, handler.name)) {
           await subhandler.execute(cmd)
         }
+      } else {
+        await handler.execute(cmd)
       }
-      await handler.execute(cmd)
     }
   }
 

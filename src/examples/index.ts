@@ -6,6 +6,7 @@ import {
   NicordClient,
   NumberOption,
   SlashCommandListener,
+  Subcommands,
 } from '../index'
 import { NicordSlashCommand } from '../nicord/command/NicordSlashCommand'
 
@@ -14,7 +15,7 @@ const client = new NicordClient([
   IntentsFlags.GUILD_MESSAGES,
 ])
 
-client.setToken('token')
+client.setToken('OTM2MjgxNjE4Njk4NjA0NjU0.YfK6NQ.OhB2n8eguXByq22bGfaXXFSDAAY')
 
 
 client.start(() => {
@@ -25,10 +26,17 @@ client.start(() => {
 @SlashCommandListener
 class MySubcommands {
   @CommandHandler
-  @Name('examplesub')
-  @Description('Example subcommand')
-  private async examplesub() {
-    // TODO:
+  @Name('hello')
+  @Description('Says hello')
+  private async sayhello(cmd: NicordSlashCommand) {
+    await cmd.reply('Hello!')
+  }
+
+  @CommandHandler
+  @Name('bye')
+  @Description('Says Bye')
+  private async saybye(cmd: NicordSlashCommand) {
+    await cmd.reply('Bye!')
   }
 }
 
@@ -36,7 +44,7 @@ class MySubcommands {
 class SlashCommands {
   @CommandHandler
   @Name('sum')
-  @Description('Sum of two numbers')
+  @Description('Sum of two numbers :)')
   @NumberOption({
     name: 'a',
     description: 'a',
@@ -55,6 +63,12 @@ class SlashCommands {
       return
     }
   }
+
+  @CommandHandler
+  @Name('say')
+  @Description('Says commands')
+  @Subcommands(MySubcommands)
+  private sayscommands() {}
 
 }
 
