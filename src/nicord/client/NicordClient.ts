@@ -34,6 +34,8 @@ export class NicordClient extends Client {
     id: string
     onClick: ButtonOnclickType
   }[] = []
+  private defaultGuildId: string | undefined
+  private localCommands: boolean = false
 
   constructor(flags: IntentsFlags[]) {
     super({
@@ -63,6 +65,16 @@ export class NicordClient extends Client {
     return !this.hasntToken
   }
 
+  set defaultGuild(guildId: string) {
+    this.defaultGuildId = guildId
+  }
+
+  localSlashCommands(): void {
+    if (!this.defaultGuildId)
+      throw new NicordClientException('You must specify the default guild to make the commands local')
+    this.localCommands = true
+  }
+
   setToken(token: string): void {
     if (this.isNotStarted) {
       this.nToken = token
@@ -78,12 +90,21 @@ export class NicordClient extends Client {
     if (this.hasToken) {
       await this.login(this.nToken)
       this.setupEventListeners()
-      await this.nrest.put(
-        Routes.applicationCommands(this?.user?.id || this?._clientId || ''),
-        {
-          body: this.slashCommands,
-        },
-      )
+      if (this.localCommands && this.defaultGuildId) {
+        await this.nrest.put(
+          Routes.applicationGuildCommands(this?.user?.id || this?._clientId || '', this.defaultGuildId),
+          {
+            body: this.slashCommands,
+          },
+        )
+      } else {
+        await this.nrest.put(
+          Routes.applicationCommands(this?.user?.id || this?._clientId || ''),
+          {
+            body: this.slashCommands,
+          },
+        )
+      }
       onReady && onReady()
     } else {
       throw new NicordClientException(

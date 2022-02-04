@@ -40,6 +40,7 @@ export type CommandOptions = Partial<{
   arguments: string[]
   permissions: NicordPermissions[]
   parentCommand: string
+  global: boolean
 }>
 
 const assignMetadata = (target, propertyKey, obj: CommandOptions) => {
@@ -188,9 +189,9 @@ export const RequiredPermissions =
       assignMetadata(target, propertyKey, { permissions })
     }
 
-// export const Arguments = (...args: string[]) => (target, propertyKey) => {
-//   assignMetadata(target, propertyKey, { arguments: args })
-// }
+export const Global = (target, propertyKey) => {
+  assignMetadata(target, propertyKey, { global: true })
+}
 
 export const UsePreset =
   (...presets: CommandOptions[]) =>

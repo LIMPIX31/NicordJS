@@ -66,6 +66,10 @@ export class NicordCommandHandler {
     return this.parentCommand ? `${this.parentCommand}/${this.name}` : this.name
   }
 
+  get global(): boolean {
+    return this.options.global || false
+  }
+
   static fromListener(
     Listener: CommandListener,
     parent?: string,

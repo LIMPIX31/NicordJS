@@ -19,6 +19,9 @@ const client = new NicordClient([
 
 client.setToken('OTM2MjgxNjE4Njk4NjA0NjU0.YfK6NQ.OhB2n8eguXByq22bGfaXXFSDAAY')
 
+client.defaultGuild = '936281805131223051'
+client.localSlashCommands()
+
 client.start(() => {
   console.log('Started!')
 })
@@ -65,7 +68,7 @@ class SlashCommands {
   }
 
   @CommandHandler
-  @Name('btn')
+  @Name('button')
   @Description('Sends a button')
   private async buttoncmd(cmd: NicordSlashCommand) {
     await cmd.reply({
