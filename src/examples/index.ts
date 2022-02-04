@@ -77,7 +77,7 @@ class SlashCommands {
   }
 
   @CommandHandler
-  @Name('saye')
+  @Name('say')
   @Description('Says commands')
   @Subcommands(MySubcommands)
   private sayscommands() {

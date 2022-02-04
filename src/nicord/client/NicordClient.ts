@@ -1,4 +1,4 @@
-import { ButtonInteraction, Client, Intents } from 'discord.js'
+import { Client, Intents } from 'discord.js'
 import { IntentsFlags } from './IntentsFlags'
 import { NicordClientException } from '../../exceptions/NicordClient.exception'
 import { CommandListener } from '../../types/CommandListener'
@@ -15,6 +15,9 @@ import { REST } from '@discordjs/rest'
 import { SlashCommandAutoBuilder } from '../command/SlashCommandAutoBuilder'
 import { Routes } from 'discord-api-types/v9'
 import { NicordCommandInteraction } from '../interaction/NicordCommandInteraction'
+import { NicordButtonInteraction } from '../interaction/NicordButtonInteraction'
+
+export type ButtonOnclickType = (interaction: NicordButtonInteraction, removeButton: () => void) => void
 
 /**
  * <h1>NicordClient</h1>
@@ -29,7 +32,7 @@ export class NicordClient extends Client {
   private slashCommands: any = []
   private activeButtons: {
     id: string
-    onClick: (interaction: ButtonInteraction, removeButton: () => void) => void
+    onClick: ButtonOnclickType
   }[] = []
 
   constructor(flags: IntentsFlags[]) {
@@ -128,7 +131,7 @@ export class NicordClient extends Client {
 
   registerButton(
     id: string,
-    onClick: (interaction: ButtonInteraction, removeButton: () => void) => void,
+    onClick: ButtonOnclickType,
   ): void {
     if (!this.activeButtons.find(v => v.id === id))
       this.activeButtons.push({ id, onClick })
@@ -164,7 +167,7 @@ export class NicordClient extends Client {
         const id = interaction.customId
         const onClick = this.activeButtons.find(v => v.id === id)?.onClick
         if (onClick)
-          onClick(interaction, () => {
+          onClick(NicordButtonInteraction.from(interaction), () => {
             this.activeButtons = this.activeButtons.filter(v => v.id !== id)
           })
       }
