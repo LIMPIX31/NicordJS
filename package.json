@@ -16,7 +16,7 @@
     "build": "tsc",
     "format": "prettier --write \"src/**/*.ts\"",
     "prepare": "yarn build",
-    "prepublishOnly": "yarn test",
+    "prepublishOnly": "yarn test --passWithNoTests",
     "version": "yarn format && git add -A src",
     "postversion": "git push && git push --tags"
   },
