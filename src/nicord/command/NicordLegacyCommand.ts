@@ -1,7 +1,6 @@
 import { NicordMessage } from '../NicordMessage'
 import { Message } from 'discord.js'
 
-
 export class NicordLegacyCommand extends NicordMessage {
   constructor(message: Message, private args: string[]) {
     super(message)
@@ -14,5 +13,4 @@ export class NicordLegacyCommand extends NicordMessage {
   get singleArgument() {
     return this.args.join(' ')
   }
-
 }

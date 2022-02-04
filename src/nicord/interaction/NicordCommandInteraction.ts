@@ -29,7 +29,9 @@ export class NicordCommandInteraction {
   }
 
   get fullCommandName(): string {
-    return this.subcommandName ? `${this.commandName}/${this.subcommandName}` : this.commandName
+    return this.subcommandName
+      ? `${this.commandName}/${this.subcommandName}`
+      : this.commandName
   }
 
   get subcommandName(): string | null {
@@ -84,5 +86,4 @@ export class NicordCommandInteraction {
   async edit(options: string | MessagePayload | InteractionReplyOptions) {
     await this.original.editReply(options)
   }
-
 }

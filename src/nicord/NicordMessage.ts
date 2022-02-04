@@ -16,7 +16,6 @@ import {
 } from 'discord.js'
 
 export class NicordMessage {
-
   private readonly _original: Message
 
   protected constructor(original: Message) {
@@ -59,11 +58,15 @@ export class NicordMessage {
     return new NicordMessage(message)
   }
 
-  async reply(options: string | MessagePayload | ReplyMessageOptions): Promise<NicordMessage> {
+  async reply(
+    options: string | MessagePayload | ReplyMessageOptions,
+  ): Promise<NicordMessage> {
     return new NicordMessage(await this.original.reply(options))
   }
 
-  async replyToDM(options: string | MessagePayload | ReplyMessageOptions): Promise<NicordMessage> {
+  async replyToDM(
+    options: string | MessagePayload | ReplyMessageOptions,
+  ): Promise<NicordMessage> {
     return new NicordMessage(await this.original.author.send(options))
   }
 
@@ -71,7 +74,9 @@ export class NicordMessage {
     return new NicordMessage(await this.original.delete())
   }
 
-  async edit(content: string | MessagePayload | ReplyMessageOptions): Promise<NicordMessage> {
+  async edit(
+    content: string | MessagePayload | ReplyMessageOptions,
+  ): Promise<NicordMessage> {
     return new NicordMessage(await this.original.edit(content))
   }
 
@@ -116,5 +121,4 @@ export class NicordMessage {
   async crosspost(): Promise<NicordMessage> {
     return new NicordMessage(await this.original.crosspost())
   }
-
 }

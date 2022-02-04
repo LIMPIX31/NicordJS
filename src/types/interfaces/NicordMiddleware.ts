@@ -3,7 +3,9 @@ import { NicordCommandInteraction } from '../../nicord/interaction/NicordCommand
 
 export type NicordMiddlewareType = 'message' | 'interaction' | 'command'
 export type NicordMiddlewareParmas = NicordMessage | NicordCommandInteraction
-export type NicordMiddlewareFunction = (entity: NicordMiddlewareParmas) => NicordMiddlewareParmas | Promise<NicordMiddlewareParmas>
+export type NicordMiddlewareFunction = (
+  entity: NicordMiddlewareParmas,
+) => NicordMiddlewareParmas | Promise<NicordMiddlewareParmas>
 
 export type NicordMiddleware = {
   type: NicordMiddlewareType

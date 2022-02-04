@@ -3,7 +3,6 @@
  * Thrown out in case of errors related to {@link NicordClient}
  */
 export class NicordClientException extends Error {
-
   constructor(reason: string) {
     super(`${reason}`)
     this._reason = reason
@@ -14,5 +13,4 @@ export class NicordClientException extends Error {
   get reason(): string {
     return this._reason
   }
-
 }

@@ -1,4 +1,7 @@
-import { SlashCommandChoice, SlashCommandField } from './decorators/CommandHandler'
+import {
+  SlashCommandChoice,
+  SlashCommandField,
+} from './decorators/CommandHandler'
 import {
   SlashCommandBooleanOption,
   SlashCommandBuilder,
@@ -34,28 +37,35 @@ export abstract class SlashCommandAutoBuilder {
     return result
   }
 
-  private static buildSlashCommandFromHandler(handler: NicordCommandHandler, command: SlashCommandBuilder | SlashCommandSubcommandBuilder) {
+  private static buildSlashCommandFromHandler(
+    handler: NicordCommandHandler,
+    command: SlashCommandBuilder | SlashCommandSubcommandBuilder,
+  ) {
     if (!handler.name || !handler.description)
-      throw new NicordClientException('Name and Description are required for slash command')
-    command
-      .setName(handler.name)
-      .setDescription(handler.description)
+      throw new NicordClientException(
+        'Name and Description are required for slash command',
+      )
+    command.setName(handler.name).setDescription(handler.description)
 
     for (let field of handler.fields) {
       if (!field.name || !field.description)
-        throw new NicordClientException('Name and Description are required for fields of slash command')
+        throw new NicordClientException(
+          'Name and Description are required for fields of slash command',
+        )
       switch (field.type) {
         case 'string':
           command.addStringOption(option => {
             this.applyNDR(field, option)
-            if (field.choices && field.choices.length > 0) option.addChoices(field.choices as SlashCommandChoice<string>[])
+            if (field.choices && field.choices.length > 0)
+              option.addChoices(field.choices as SlashCommandChoice<string>[])
             return option
           })
           break
         case 'number':
           command.addNumberOption(option => {
             this.applyNDR(field, option)
-            if (field.choices && field.choices.length > 0) option.addChoices(field.choices as SlashCommandChoice<number>[])
+            if (field.choices && field.choices.length > 0)
+              option.addChoices(field.choices as SlashCommandChoice<number>[])
             return option
           })
           break
@@ -68,7 +78,8 @@ export abstract class SlashCommandAutoBuilder {
         case 'integer':
           command.addIntegerOption(option => {
             this.applyNDR(field, option)
-            if (field.choices && field.choices.length > 0) option.addChoices(field.choices as SlashCommandChoice<number>[])
+            if (field.choices && field.choices.length > 0)
+              option.addChoices(field.choices as SlashCommandChoice<number>[])
             return option
           })
           break
@@ -94,7 +105,10 @@ export abstract class SlashCommandAutoBuilder {
     }
 
     if (handler.subcommands && command instanceof SlashCommandBuilder) {
-      const subcommands = this.buildSlashCommandsFromListener(handler.subcommands, true)
+      const subcommands = this.buildSlashCommandsFromListener(
+        handler.subcommands,
+        true,
+      )
       for (const sub of subcommands) {
         command.addSubcommand(<SlashCommandSubcommandBuilder>sub)
       }
@@ -103,25 +117,39 @@ export abstract class SlashCommandAutoBuilder {
     return command
   }
 
-  private static buildSlashCommandsFromListener(Listener: CommandListener, subcommands: boolean = false) {
-    if (!(NicordTools.isCommandListener(Listener) && NicordTools.isSlashListener(Listener)))
-      throw new NicordClientException('Listener must be valid slash command listener')
+  private static buildSlashCommandsFromListener(
+    Listener: CommandListener,
+    subcommands: boolean = false,
+  ) {
+    if (
+      !(
+        NicordTools.isCommandListener(Listener) &&
+        NicordTools.isSlashListener(Listener)
+      )
+    )
+      throw new NicordClientException(
+        'Listener must be valid slash command listener',
+      )
     const commands: (SlashCommandBuilder | SlashCommandSubcommandBuilder)[] = []
     for (const handler of NicordCommandHandler.fromListener(Listener)) {
       if (subcommands) {
-        commands.push(this.buildSlashCommandFromHandler(handler, new SlashCommandSubcommandBuilder()))
+        commands.push(
+          this.buildSlashCommandFromHandler(
+            handler,
+            new SlashCommandSubcommandBuilder(),
+          ),
+        )
       } else {
-        commands.push(this.buildSlashCommandFromHandler(handler, new SlashCommandBuilder()))
+        commands.push(
+          this.buildSlashCommandFromHandler(handler, new SlashCommandBuilder()),
+        )
       }
     }
     return commands
   }
 
   private static applyNDR(field: SlashCommandField, option: SlashOption) {
-    option
-      .setName(field.name)
-      .setRequired(field.required || true)
-    field.description && (option.setDescription(field.description))
+    option.setName(field.name).setRequired(field.required || true)
+    field.description && option.setDescription(field.description)
   }
-
 }

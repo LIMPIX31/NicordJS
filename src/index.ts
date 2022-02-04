@@ -55,5 +55,5 @@ export {
   UserOption,
   RoleOption,
   MentionableOption,
-  NumberOption
+  NumberOption,
 }

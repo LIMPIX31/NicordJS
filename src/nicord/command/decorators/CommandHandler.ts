@@ -52,7 +52,7 @@ export type CommandOptions = Partial<{
   fields: SlashCommandField[]
   subcommands: CommandListener
   arguments: string[]
-  permissions: NicordPermissions[],
+  permissions: NicordPermissions[]
   parentCommand: string
 }>
 

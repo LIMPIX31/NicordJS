@@ -4,7 +4,10 @@ import { MetadataKeys } from '../utils/MetadataKeys'
 
 export abstract class NicordTools {
   static isCommandListener(Listener: CommandListener) {
-    return Reflect.hasMetadata(MetadataKeys.isCommandListener, Listener.prototype)
+    return Reflect.hasMetadata(
+      MetadataKeys.isCommandListener,
+      Listener.prototype,
+    )
   }
 
   static isSlashListener(Listener: CommandListener) {

@@ -11,10 +11,7 @@ import { NicordPermissions } from '../NicordPermissions'
 import { NicordSlashCommand } from './NicordSlashCommand'
 
 export class NicordCommandHandler {
-  constructor(
-    private fn: Function,
-    private options: CommandOptions) {
-  }
+  constructor(private fn: Function, private options: CommandOptions) {}
 
   get prefix(): string {
     return this.options.prefix || '!'
@@ -68,24 +65,52 @@ export class NicordCommandHandler {
     return this.parentCommand ? `${this.parentCommand}/${this.name}` : this.name
   }
 
-  static fromListener(Listener: CommandListener, parent?: string): NicordCommandHandler[] {
+  static fromListener(
+    Listener: CommandListener,
+    parent?: string,
+  ): NicordCommandHandler[] {
     if (!NicordTools.isCommandListener(Listener))
-      throw new NicordClientException('Value must be valid command listener. Check if you are using the right decorator.')
-    const listenerOptions: CommandOptions = Reflect.getMetadata(MetadataKeys.commandHandlerOptions, Listener.prototype)
+      throw new NicordClientException(
+        'Value must be valid command listener. Check if you are using the right decorator.',
+      )
+    const listenerOptions: CommandOptions = Reflect.getMetadata(
+      MetadataKeys.commandHandlerOptions,
+      Listener.prototype,
+    )
     const handlers: NicordCommandHandler[] = []
     for (const protokey of Object.getOwnPropertyNames(Listener.prototype)) {
       const method = Listener.prototype[protokey]
-      if (Reflect.hasMetadata(MetadataKeys.isCommandHandler, Listener.prototype, protokey)) {
-        const handlerOptions: CommandOptions = Reflect.getMetadata(MetadataKeys.commandHandlerOptions, Listener.prototype, protokey)
-        handlers.push(new NicordCommandHandler(method, Object.assign(
-          {}, listenerOptions, handlerOptions, parent ? ({ parentCommand: parent } as CommandOptions) : ({}))))
+      if (
+        Reflect.hasMetadata(
+          MetadataKeys.isCommandHandler,
+          Listener.prototype,
+          protokey,
+        )
+      ) {
+        const handlerOptions: CommandOptions = Reflect.getMetadata(
+          MetadataKeys.commandHandlerOptions,
+          Listener.prototype,
+          protokey,
+        )
+        handlers.push(
+          new NicordCommandHandler(
+            method,
+            Object.assign(
+              {},
+              listenerOptions,
+              handlerOptions,
+              parent ? ({ parentCommand: parent } as CommandOptions) : {},
+            ),
+          ),
+        )
       }
     }
     return handlers
   }
 
-
-  async executableFor(msg: NicordMessage | NicordCommandInteraction): Promise<boolean> {
+  async executableFor(
+    msg: NicordMessage | NicordCommandInteraction,
+  ): Promise<boolean> {
     if (this.restrictedAccess) {
       let allowed = false
       const guild = await msg.guild
@@ -94,13 +119,27 @@ export class NicordCommandHandler {
         const rolesWhitelist = this.rolesWhitelist
         const rolesBlacklist = this.rolesBlacklist
         if (rolesWhitelist)
-          allowedRoles = allowedRoles.filter(role => rolesWhitelist.includes(role))
+          allowedRoles = allowedRoles.filter(role =>
+            rolesWhitelist.includes(role),
+          )
         if (rolesBlacklist)
-          allowedRoles = allowedRoles.filter(role => !rolesBlacklist.includes(role))
-        if (msg.member && msg.member.roles instanceof GuildMemberRoleManager && msg.member.permissions instanceof Permissions) {
-          allowed = msg.member.roles.cache.filter(dr => allowedRoles.includes(dr.id)).map(v => v).length > 0
-            && this.adminOnly === msg.member.permissions.has('ADMINISTRATOR')
-          if (this.permissions) allowed = msg.member.permissions.has(this.permissions.map(v => Permissions.FLAGS[v]))
+          allowedRoles = allowedRoles.filter(
+            role => !rolesBlacklist.includes(role),
+          )
+        if (
+          msg.member &&
+          msg.member.roles instanceof GuildMemberRoleManager &&
+          msg.member.permissions instanceof Permissions
+        ) {
+          allowed =
+            msg.member.roles.cache
+              .filter(dr => allowedRoles.includes(dr.id))
+              .map(v => v).length > 0 &&
+            this.adminOnly === msg.member.permissions.has('ADMINISTRATOR')
+          if (this.permissions)
+            allowed = msg.member.permissions.has(
+              this.permissions.map(v => Permissions.FLAGS[v]),
+            )
         }
         return allowed
       }
@@ -110,11 +149,15 @@ export class NicordCommandHandler {
     }
   }
 
-
-  async execute(entity: NicordMessage | NicordCommandInteraction): Promise<void> {
+  async execute(
+    entity: NicordMessage | NicordCommandInteraction,
+  ): Promise<void> {
     if (entity instanceof NicordMessage) {
       const msg = entity
-      if (await this.executableFor(msg) && msg.content.startsWith(this.prefix)) {
+      if (
+        (await this.executableFor(msg)) &&
+        msg.content.startsWith(this.prefix)
+      ) {
         const args = msg.content.split(this.argsSplitter)
         if (args[0] === this.prefix + this.name) {
           await this.fn(new NicordLegacyCommand(msg.original, args.slice(1)))
@@ -122,11 +165,12 @@ export class NicordCommandHandler {
       }
     } else if (entity instanceof NicordCommandInteraction) {
       const cmd = entity
-      console.log(this.fullCommandName, cmd.fullCommandName)
-      if (await this.executableFor(cmd) && this.fullCommandName === cmd.fullCommandName) {
+      if (
+        (await this.executableFor(cmd)) &&
+        this.fullCommandName === cmd.fullCommandName
+      ) {
         await this.fn(new NicordSlashCommand(cmd))
       }
     }
   }
-
 }

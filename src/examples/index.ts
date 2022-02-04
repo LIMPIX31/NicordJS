@@ -2,6 +2,8 @@ import {
   CommandHandler,
   Description,
   IntentsFlags,
+  MessageActionRow,
+  MessageButton,
   Name,
   NicordClient,
   NumberOption,
@@ -17,11 +19,9 @@ const client = new NicordClient([
 
 client.setToken('OTM2MjgxNjE4Njk4NjA0NjU0.YfK6NQ.OhB2n8eguXByq22bGfaXXFSDAAY')
 
-
 client.start(() => {
   console.log('Started!')
 })
-
 
 @SlashCommandListener
 class MySubcommands {
@@ -65,11 +65,29 @@ class SlashCommands {
   }
 
   @CommandHandler
-  @Name('say')
+  @Name('btn')
+  @Description('Sends a button')
+  private async buttoncmd(cmd: NicordSlashCommand) {
+    await cmd.reply({
+      content: 'Click on button',
+      components: [
+        new MessageActionRow().addComponents(
+          client.buildButton(
+            new MessageButton().setLabel('Click me').setStyle('PRIMARY'),
+            (interaction, remove) => {
+              interaction.reply('Clicked')
+            },
+          ),
+        ),
+      ],
+    })
+  }
+
+  @CommandHandler
+  @Name('saye')
   @Description('Says commands')
   @Subcommands(MySubcommands)
   private sayscommands() {}
-
 }
 
 client.addCommandListener(SlashCommands)

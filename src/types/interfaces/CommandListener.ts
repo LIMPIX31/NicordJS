@@ -1,3 +1,3 @@
 export interface CommandListener {
-  new(): void
+  new (): void
 }

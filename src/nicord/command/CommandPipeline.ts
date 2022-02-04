@@ -16,14 +16,19 @@ export abstract class CommandPipeline {
     }
   }
 
-  static async slashCommand(cmd: NicordCommandInteraction, Listener: CommandListener) {
+  static async slashCommand(
+    cmd: NicordCommandInteraction,
+    Listener: CommandListener,
+  ) {
     if (!NicordTools.isCommandListener(Listener))
       throw new NicordClientException('Listener must be valid')
-    console.log(cmd.original, cmd.commandName)
     const handlers = NicordCommandHandler.fromListener(Listener)
     for (const handler of handlers) {
       if (handler.subcommands) {
-        for (const subhandler of NicordCommandHandler.fromListener(handler.subcommands, handler.name)) {
+        for (const subhandler of NicordCommandHandler.fromListener(
+          handler.subcommands,
+          handler.name,
+        )) {
           await subhandler.execute(cmd)
         }
       } else {
@@ -31,5 +36,4 @@ export abstract class CommandPipeline {
       }
     }
   }
-
 }
