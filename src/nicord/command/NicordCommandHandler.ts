@@ -9,6 +9,7 @@ import { NicordMessage } from '../NicordMessage'
 import { NicordCommandInteraction } from '../interaction/NicordCommandInteraction'
 import { NicordPermissions } from '../client/NicordPermissions'
 import { NicordSlashCommand } from './NicordSlashCommand'
+import { NicordCommandError } from '../NicordCommandError'
 
 export class NicordCommandHandler {
   constructor(private fn: Function, private options: CommandOptions) {
@@ -47,7 +48,7 @@ export class NicordCommandHandler {
   }
 
   get permissions(): NicordPermissions[] | undefined {
-    return this.options.permissions || []
+    return this.options.permissions
   }
 
   get description(): string | undefined {
@@ -68,6 +69,10 @@ export class NicordCommandHandler {
 
   get global(): boolean {
     return this.options.global || false
+  }
+
+  get guard(): Function {
+    return this.options.guard || (() => true)
   }
 
   static fromListener(
@@ -139,8 +144,9 @@ export class NicordCommandHandler {
           allowed =
             msg.member.roles.cache
               .filter(dr => allowedRoles.includes(dr.id))
-              .map(v => v).length > 0 &&
-            this.adminOnly === msg.member.permissions.has('ADMINISTRATOR')
+              .map(v => v).length > 0
+          if (this.adminOnly)
+            allowed = msg.member.permissions.has('ADMINISTRATOR')
           if (this.permissions)
             allowed = msg.member.permissions.has(
               this.permissions.map(v => Permissions.FLAGS[v]),
@@ -159,22 +165,33 @@ export class NicordCommandHandler {
   ): Promise<void> {
     if (entity instanceof NicordMessage) {
       const msg = entity
-      if (
-        (await this.executableFor(msg)) &&
-        msg.content.startsWith(this.prefix)
-      ) {
-        const args = msg.content.split(this.argsSplitter)
-        if (args[0] === this.prefix + this.name) {
-          await this.fn(new NicordLegacyCommand(msg.original, args.slice(1)))
+      const args = msg.content.split(this.argsSplitter)
+      if (msg.content.startsWith(this.prefix) && args[0] === this.prefix + this.name) {
+        const cmd = new NicordLegacyCommand(msg.original, args.slice(1))
+        if (await this.executableFor(msg)) {
+          const doExecute = !!(await this.guard(cmd))
+          if (doExecute) {
+            await this.fn(cmd)
+          }
+        } else {
+          const error = new NicordCommandError()
+          error.unpermitted = true
+          await this.guard(cmd, error)
         }
       }
     } else if (entity instanceof NicordCommandInteraction) {
       const cmd = entity
-      if (
-        (await this.executableFor(cmd)) &&
-        this.fullCommandName === cmd.fullCommandName
-      ) {
-        await this.fn(new NicordSlashCommand(cmd))
+      if (this.fullCommandName === cmd.fullCommandName) {
+        if (await this.executableFor(cmd)) {
+          const doExecute = !!(await this.guard(new NicordSlashCommand(cmd)))
+          if (doExecute) {
+            await this.fn(new NicordSlashCommand(cmd))
+          }
+        } else {
+          const error = new NicordCommandError()
+          error.unpermitted = true
+          await this.guard(new NicordSlashCommand(cmd), error)
+        }
       }
     }
   }

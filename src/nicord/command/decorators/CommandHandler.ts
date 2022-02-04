@@ -41,6 +41,7 @@ export type CommandOptions = Partial<{
   permissions: NicordPermissions[]
   parentCommand: string
   global: boolean
+  guard: Function
 }>
 
 const assignMetadata = (target, propertyKey, obj: CommandOptions) => {
@@ -101,7 +102,7 @@ const addOption = (
   assignMetadata(target, propertyKey, { fields: [...fields] })
 }
 
-export const CommandHandler = (target, propertyKey) => {
+export const CommandHandler: MethodDecorator = (target, propertyKey) => {
   Reflect.defineMetadata(
     MetadataKeys.isCommandHandler,
     true,
@@ -191,6 +192,10 @@ export const RequiredPermissions =
 
 export const Global = (target, propertyKey) => {
   assignMetadata(target, propertyKey, { global: true })
+}
+
+export const UseGuard = (fn: Function) => (target, propertyKey) => {
+  assignMetadata(target, propertyKey, { guard: fn })
 }
 
 export const UsePreset =

@@ -6,10 +6,13 @@ import {
   Name,
   NicordButton,
   NicordClient,
+  NicordCommandError,
   NicordSlashCommand,
   NumberOption,
   SlashCommandListener,
-  Subcommands,
+  StringOption,
+  UseGuard,
+  WhitelistedRoles,
 } from '../index'
 
 const client = new NicordClient([
@@ -27,23 +30,6 @@ client.start(() => {
 })
 
 @SlashCommandListener
-class MySubcommands {
-  @CommandHandler
-  @Name('hello')
-  @Description('Says hello')
-  private async sayhello(cmd: NicordSlashCommand) {
-    await cmd.reply('Hello!')
-  }
-
-  @CommandHandler
-  @Name('bye')
-  @Description('Says Bye')
-  private async saybye(cmd: NicordSlashCommand) {
-    await cmd.reply('Bye!')
-  }
-}
-
-@SlashCommandListener
 class SlashCommands {
   @CommandHandler
   @Name('sum')
@@ -55,6 +41,9 @@ class SlashCommands {
   @NumberOption({
     name: 'b',
     description: 'b',
+  })
+  @UseGuard((cmd: NicordSlashCommand, err: NicordCommandError) => {
+
   })
   private async sum(cmd: NicordSlashCommand) {
     const a = cmd.getOption<number>('a')
@@ -81,10 +70,27 @@ class SlashCommands {
 
   @CommandHandler
   @Name('say')
-  @Description('Says commands')
-  @Subcommands(MySubcommands)
-  private sayscommands() {
+  @Description('Say anything')
+  @StringOption({
+    name: 'text',
+    description: 'Текст',
+  })
+  @WhitelistedRoles('936555104293761095')
+  @UseGuard(async (cmd: NicordSlashCommand, err: NicordCommandError) => {
+    if (err) {
+      await cmd.ephemeral('You are not permitted')
+      return false
+    }
+    if (cmd.getOption<string>('text') === 'книга'.substring(1)) {
+      await cmd.reply('Забанить его!!!')
+      return false
+    }
+    return true
+  })
+  private async say(cmd: NicordSlashCommand) {
+    await cmd.reply(cmd.getOption<string>('text') || 'Он промолчал')
   }
+
 }
 
 client.registerButton('clickme', async (interaction) => {

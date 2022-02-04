@@ -15,6 +15,7 @@ import {
   RoleOption,
   StringOption,
   Subcommands,
+  UseGuard,
   UsePreset,
   UserOption,
   WhitelistedRoles,
@@ -35,6 +36,7 @@ import { NicordInteraction } from './nicord/interaction/NicordInteraction'
 import { NicordRepliableInteraction } from './nicord/interaction/NicordRepliableInteraction'
 import { CommandListener } from './types/CommandListener'
 import { NicordMiddleware } from './types/NicordMiddleware'
+import { NicordCommandError } from './nicord/NicordCommandError'
 
 export * from 'discord.js'
 
@@ -74,4 +76,6 @@ export {
   NicordRepliableInteraction,
   CommandListener,
   NicordMiddleware,
+  NicordCommandError,
+  UseGuard,
 }
