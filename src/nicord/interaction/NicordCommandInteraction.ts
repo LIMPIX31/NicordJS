@@ -27,5 +27,4 @@ export class NicordCommandInteraction extends NicordRepliableInteraction<Command
   getOption<T = string | number | boolean>(option: string): T | undefined {
     return this.original?.options.get(option)?.value as unknown as T
   }
-
 }

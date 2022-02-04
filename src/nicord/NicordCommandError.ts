@@ -8,5 +8,4 @@ export class NicordCommandError {
   set unpermitted(unpermitted: boolean) {
     this._unpermitted = unpermitted
   }
-
 }

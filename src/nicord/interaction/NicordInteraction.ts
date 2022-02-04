@@ -2,7 +2,9 @@ import { Guild, GuildMember, Interaction, User } from 'discord.js'
 import { APIInteractionGuildMember } from 'discord-api-types'
 import { OriginalShadow } from '../../utils/OriginalShadow'
 
-export abstract class NicordInteraction<T extends Interaction> extends OriginalShadow<T> {
+export abstract class NicordInteraction<
+  T extends Interaction,
+> extends OriginalShadow<T> {
   get user(): User {
     return this.original.user
   }
@@ -34,5 +36,4 @@ export abstract class NicordInteraction<T extends Interaction> extends OriginalS
   get inGuild(): boolean {
     return this.original.inGuild()
   }
-
 }

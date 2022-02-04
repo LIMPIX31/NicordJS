@@ -17,7 +17,6 @@ import {
 import { OriginalShadow } from '../utils/OriginalShadow'
 
 export class NicordMessage extends OriginalShadow<Message> {
-
   get author(): User {
     return this.original.author
   }

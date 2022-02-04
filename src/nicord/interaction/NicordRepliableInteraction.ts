@@ -8,7 +8,13 @@ import {
   SelectMenuInteraction,
 } from 'discord.js'
 
-export class NicordRepliableInteraction<T extends CommandInteraction | ButtonInteraction | ContextMenuInteraction | SelectMenuInteraction> extends NicordInteraction<T> {
+export class NicordRepliableInteraction<
+  T extends
+    | CommandInteraction
+    | ButtonInteraction
+    | ContextMenuInteraction
+    | SelectMenuInteraction,
+> extends NicordInteraction<T> {
   async defer(ephemeral: boolean = true, fetch: boolean = true) {
     await this.original.deferReply({
       ephemeral,

@@ -12,8 +12,7 @@ import { NicordSlashCommand } from './NicordSlashCommand'
 import { NicordCommandError } from '../NicordCommandError'
 
 export class NicordCommandHandler {
-  constructor(private fn: Function, private options: CommandOptions) {
-  }
+  constructor(private fn: Function, private options: CommandOptions) {}
 
   get prefix(): string {
     return this.options.prefix || '!'
@@ -166,7 +165,10 @@ export class NicordCommandHandler {
     if (entity instanceof NicordMessage) {
       const msg = entity
       const args = msg.content.split(this.argsSplitter)
-      if (msg.content.startsWith(this.prefix) && args[0] === this.prefix + this.name) {
+      if (
+        msg.content.startsWith(this.prefix) &&
+        args[0] === this.prefix + this.name
+      ) {
         const cmd = new NicordLegacyCommand(msg.original, args.slice(1))
         if (await this.executableFor(msg)) {
           const doExecute = !!(await this.guard(cmd))

@@ -17,7 +17,10 @@ import { Routes } from 'discord-api-types/v9'
 import { NicordCommandInteraction } from '../interaction/NicordCommandInteraction'
 import { NicordButtonInteraction } from '../interaction/NicordButtonInteraction'
 
-export type ButtonOnclickType = (interaction: NicordButtonInteraction, removeButton: () => void) => void
+export type ButtonOnclickType = (
+  interaction: NicordButtonInteraction,
+  removeButton: () => void,
+) => void
 
 /**
  * <h1>NicordClient</h1>
@@ -71,7 +74,9 @@ export class NicordClient extends Client {
 
   localSlashCommands(): void {
     if (!this.defaultGuildId)
-      throw new NicordClientException('You must specify the default guild to make the commands local')
+      throw new NicordClientException(
+        'You must specify the default guild to make the commands local',
+      )
     this.localCommands = true
   }
 
@@ -92,7 +97,10 @@ export class NicordClient extends Client {
       this.setupEventListeners()
       if (this.localCommands && this.defaultGuildId) {
         await this.nrest.put(
-          Routes.applicationGuildCommands(this?.user?.id || this?._clientId || '', this.defaultGuildId),
+          Routes.applicationGuildCommands(
+            this?.user?.id || this?._clientId || '',
+            this.defaultGuildId,
+          ),
           {
             body: this.slashCommands,
           },
@@ -150,14 +158,10 @@ export class NicordClient extends Client {
     })
   }
 
-  registerButton(
-    id: string,
-    onClick: ButtonOnclickType,
-  ): void {
+  registerButton(id: string, onClick: ButtonOnclickType): void {
     if (!this.activeButtons.find(v => v.id === id))
       this.activeButtons.push({ id, onClick })
-    else
-      throw new NicordClientException(`Duplicated button id: ${id}`)
+    else throw new NicordClientException(`Duplicated button id: ${id}`)
   }
 
   private setupEventListeners(): void {
