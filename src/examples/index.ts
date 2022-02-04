@@ -2,8 +2,6 @@ import {
   CommandHandler,
   Description,
   IntentsFlags,
-  MessageActionRow,
-  MessageButton,
   Name,
   NicordClient,
   NumberOption,
@@ -11,6 +9,8 @@ import {
   Subcommands,
 } from '../index'
 import { NicordSlashCommand } from '../nicord/command/NicordSlashCommand'
+import { ButtonRowComponent } from '../nicord/ButtonRowComponent'
+import { NicordButton } from '../nicord/NicordButton'
 
 const client = new NicordClient([
   IntentsFlags.GUILDS,
@@ -70,16 +70,9 @@ class SlashCommands {
   private async buttoncmd(cmd: NicordSlashCommand) {
     await cmd.reply({
       content: 'Click on button',
-      components: [
-        new MessageActionRow().addComponents(
-          client.buildButton(
-            new MessageButton().setLabel('Click me').setStyle('PRIMARY'),
-            (interaction, remove) => {
-              interaction.reply('Clicked')
-            },
-          ),
-        ),
-      ],
+      components: [new ButtonRowComponent(
+        new NicordButton('clickme', 'Нажми бобёр', 'PRIMARY')
+      )],
     })
   }
 
@@ -87,7 +80,12 @@ class SlashCommands {
   @Name('saye')
   @Description('Says commands')
   @Subcommands(MySubcommands)
-  private sayscommands() {}
+  private sayscommands() {
+  }
 }
+
+client.registerButton('clickme', async (interaction) => {
+  await interaction.reply('Нажал, молодец!')
+})
 
 client.addCommandListener(SlashCommands)

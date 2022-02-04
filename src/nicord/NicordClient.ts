@@ -1,4 +1,4 @@
-import { ButtonInteraction, Client, Intents, MessageButton } from 'discord.js'
+import { ButtonInteraction, Client, Intents } from 'discord.js'
 import { IntentsFlags } from './IntentsFlags'
 import { NicordClientException } from '../exceptions/NicordClient.exception'
 import { CommandListener } from '../types/interfaces/CommandListener'
@@ -15,7 +15,6 @@ import { REST } from '@discordjs/rest'
 import { SlashCommandAutoBuilder } from './command/SlashCommandAutoBuilder'
 import { Routes } from 'discord-api-types/v9'
 import { NicordCommandInteraction } from './interaction/NicordCommandInteraction'
-import { v4 as UUIDv4 } from 'uuid'
 
 /**
  * <h1>NicordClient</h1>
@@ -127,14 +126,14 @@ export class NicordClient extends Client {
     })
   }
 
-  buildButton(
-    button: MessageButton,
+  registerButton(
+    id: string,
     onClick: (interaction: ButtonInteraction, removeButton: () => void) => void,
-  ) {
-    const id = UUIDv4().toString().replaceAll('-', '')
-    button.setCustomId(id)
-    this.activeButtons.push({ id, onClick })
-    return button
+  ): void {
+    if (!this.activeButtons.find(v => v.id === id))
+      this.activeButtons.push({ id, onClick })
+    else
+      throw new NicordClientException(`Duplicated button id: ${id}`)
   }
 
   private setupEventListeners(): void {
