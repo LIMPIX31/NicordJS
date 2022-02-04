@@ -129,7 +129,7 @@ class Subcommands {
   @CommandHandler
   @Name('b')
   @Description('action B')
-  private a() {/* TODO */}
+  private b() {/* TODO */}
 }
 
 @SlashCommandListener
