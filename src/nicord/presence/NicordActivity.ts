@@ -60,5 +60,4 @@ export class NicordActivity {
       this._refreshFn()
     }
   }
-
 }

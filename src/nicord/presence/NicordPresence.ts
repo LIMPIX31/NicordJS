@@ -3,7 +3,6 @@ import { NicordActivity } from './NicordActivity'
 import { NicordClient } from '../client/NicordClient'
 
 export class NicordPresence {
-
   private __client: NicordClient | undefined
   private _refresh: boolean = false
   private _activities: NicordActivity[] = []
@@ -112,7 +111,8 @@ export class NicordPresence {
   }
 
   private applyRefreshCallbacks(): void {
-    this._activities = this._activities.map(v => v._refreshOptions(this.refresh.bind(this)))
+    this._activities = this._activities.map(v =>
+      v._refreshOptions(this.refresh.bind(this)),
+    )
   }
-
 }
