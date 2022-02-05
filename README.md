@@ -120,7 +120,7 @@ command execution, false - deny)
 
 ```ts
 @SlashCommandListener
-class Subcommands {
+class MySubcommands {
   @CommandHandler
   @Name('a')
   @Description('action A')
@@ -137,7 +137,7 @@ class SlashCommands {
   @CommandHandler
   @Name('actions')
   @Description('Some actions')
-  @Subcommands(Subcommands)
+  @Subcommands(MySubcommands)
   private actions() {}
 }
 
