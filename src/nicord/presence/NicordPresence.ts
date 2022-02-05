@@ -6,23 +6,29 @@ export class NicordPresence {
 
   private __client: NicordClient | undefined
   private _refresh: boolean = false
+  private _activities: NicordActivity[] = []
 
   private __data: PresenceData = {}
 
   get _data(): PresenceData {
-    return this.__data
+    return {
+      ...this.__data,
+      activities: [...this._activities.map(v => v._data)],
+    }
   }
 
   addActivity(activity: NicordActivity): NicordPresence {
     if (!this.__data.activities) this.__data.activities = []
-    this.__data.activities.push(activity._data)
+    this._activities.push(activity)
+    this.applyRefreshCallbacks()
     this.refresh()
     return this
   }
 
   addActivities(...activities: NicordActivity[]): NicordPresence {
     if (!this.__data.activities) this.__data.activities = []
-    this.__data.activities.push(...activities.map(a => a._data))
+    this._activities.push(...activities)
+    this.applyRefreshCallbacks()
     this.refresh()
     return this
   }
@@ -33,8 +39,22 @@ export class NicordPresence {
     return this
   }
 
+  removeActivity(activity: NicordActivity): NicordPresence {
+    this._activities = this._activities.filter(v => v !== activity)
+    return this
+  }
+
+  getActivity(): NicordActivity | undefined {
+    return this._activities[0]
+  }
+
+  getActivities(): NicordActivity[] {
+    return this._activities
+  }
+
   setActivities(...activities: NicordActivity[]): NicordPresence {
-    this.__data.activities = [...activities.map(a => a._data)]
+    this._activities = [...activities]
+    this.applyRefreshCallbacks()
     this.refresh()
     return this
   }
@@ -89,6 +109,10 @@ export class NicordPresence {
     if (this._refresh) {
       this.__client?.updatePresence()
     }
+  }
+
+  private applyRefreshCallbacks(): void {
+    this._activities = this._activities.map(v => v._refreshOptions(this.refresh.bind(this)))
   }
 
 }
