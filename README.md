@@ -5,8 +5,11 @@ Modern library for create simple discord bots based on DiscordJS
 ## Installing
 
 ```bash
+# using npm
 npm i nicord.js --save
+# using yarn
 yarn add nicord.js
+# using pnpm
 pnpm add nicord.js
 ```
 
@@ -31,7 +34,7 @@ client.start(() => {
   console.log('Started!')
 })
 
-// Declares the class a listener of slash commands
+// Declares the class as a listener of slash commands
 @SlashCommandListener
 class SlashCommands {
   // Declares a method as a command handler
@@ -170,5 +173,31 @@ Thinking about message logging or filtering unwanted content? Use middlewares
 client.useMiddleware('message', (entity) => {
   console.log((entity as NicordMessage).content)
   return entity
+})
+```
+
+## Presence
+```ts
+client.start(() => {
+  console.log('Started!')
+  // Create presence after client startup
+  const presence = new NicordPresence()
+    // Make presence refreshable, so that status and activity updates automatically
+    .refreshable()
+    // Sets the status to Do Not Disturb
+    .dnd()
+    // Adds activity
+    .addActivity(new NicordActivity()
+      // playing, streaming, etc...
+      .playing()
+      // Activity name
+      .setName('Minecraft')
+    )
+  // Apply presence
+  client.setPresence(presence)
+  // We update the status after 10 seconds, thanks to `refreshable`, we do not need to update manually
+  setTimeout(() => {
+    presence.idle()
+  }, 10000)
 })
 ```
