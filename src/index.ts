@@ -37,6 +37,8 @@ import { NicordRepliableInteraction } from './nicord/interaction/NicordRepliable
 import { CommandListener } from './types/CommandListener'
 import { NicordMiddleware } from './types/NicordMiddleware'
 import { NicordCommandError } from './nicord/NicordCommandError'
+import { NicordPresence } from './nicord/presence/NicordPresence'
+import { NicordActivity } from './nicord/presence/NicordActivity'
 
 export * from 'discord.js'
 
@@ -78,4 +80,6 @@ export {
   NicordMiddleware,
   NicordCommandError,
   UseGuard,
+  NicordPresence,
+  NicordActivity,
 }

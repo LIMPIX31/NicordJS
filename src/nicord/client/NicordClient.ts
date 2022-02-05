@@ -16,6 +16,7 @@ import { SlashCommandAutoBuilder } from '../command/SlashCommandAutoBuilder'
 import { Routes } from 'discord-api-types/v9'
 import { NicordCommandInteraction } from '../interaction/NicordCommandInteraction'
 import { NicordButtonInteraction } from '../interaction/NicordButtonInteraction'
+import { NicordPresence } from '../presence/NicordPresence'
 
 export type ButtonOnclickType = (
   interaction: NicordButtonInteraction,
@@ -39,6 +40,7 @@ export class NicordClient extends Client {
   }[] = []
   private defaultGuildId: string | undefined
   private localCommands: boolean = false
+  private npresence: NicordPresence = new NicordPresence()
 
   constructor(flags: IntentsFlags[]) {
     super({
@@ -113,6 +115,7 @@ export class NicordClient extends Client {
           },
         )
       }
+      this.started = true
       onReady && onReady()
     } else {
       throw new NicordClientException(
@@ -162,6 +165,17 @@ export class NicordClient extends Client {
     if (!this.activeButtons.find(v => v.id === id))
       this.activeButtons.push({ id, onClick })
     else throw new NicordClientException(`Duplicated button id: ${id}`)
+  }
+
+  setPresence(presence: NicordPresence) {
+    if (this.isNotStarted)
+      throw new NicordClientException('Presence can only be set after startup')
+    this.npresence = presence._setClient(this)
+    this.user?.setPresence(this.npresence._data)
+  }
+
+  updatePresence(): void {
+    this.user?.setPresence(this.npresence._data)
   }
 
   private setupEventListeners(): void {
