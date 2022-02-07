@@ -215,5 +215,5 @@ import `DiscordJS` classes and types from `NicordJS`, since `NicordJS` inherits 
 
 ## Credits
 
-[discord.js](https://www.npmjs.com/package/discord.js) - discord.js is a powerful Node.js module that allows you to
-easily interact with the Discord API.
+[discord.js](https://www.npmjs.com/package/discord.js) - is a powerful Node.js module that allows you to easily interact
+with the Discord API.
