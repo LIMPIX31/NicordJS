@@ -42,7 +42,7 @@ export class NicordClient extends Client {
   private localCommands: boolean = false
   private npresence: NicordPresence = new NicordPresence()
 
-  constructor(flags: IntentsFlags[]) {
+  constructor(flags: IntentsFlags[] = [IntentsFlags.GUILDS, IntentsFlags.GUILD_MESSAGES]) {
     super({
       intents: [flags.map(flag => Intents.FLAGS[flag])],
     })
