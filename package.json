@@ -26,7 +26,11 @@
     "Discord",
     "Bot",
     "Framework",
-    "Nicord"
+    "Nicord",
+    "node",
+    "javascript",
+    "typescript",
+    "library"
   ],
   "bugs": {
     "url": "https://github.com/LIMPIX31/NicordJS/issues"
