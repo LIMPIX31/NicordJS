@@ -127,12 +127,14 @@ class MySubcommands {
   @CommandHandler
   @Name('a')
   @Description('action A')
-  private a() {/* TODO */}
+  private a() {/* TODO */
+  }
 
   @CommandHandler
   @Name('b')
   @Description('action B')
-  private b() {/* TODO */}
+  private b() {/* TODO */
+  }
 }
 
 @SlashCommandListener
@@ -141,7 +143,8 @@ class SlashCommands {
   @Name('actions')
   @Description('Some actions')
   @Subcommands(MySubcommands)
-  private actions() {}
+  private actions() {
+  }
 }
 
 // then register SlashCommands; Subcommands register automatically
@@ -168,7 +171,9 @@ client.registerButton('saydm', (interaction) => {
 ```
 
 ## Middlewares
+
 Thinking about message logging or filtering unwanted content? Use middlewares
+
 ```ts
 client.useMiddleware('message', (entity) => {
   console.log((entity as NicordMessage).content)
@@ -177,6 +182,7 @@ client.useMiddleware('message', (entity) => {
 ```
 
 ## Presence
+
 ```ts
 client.start(() => {
   console.log('Started!')
@@ -201,3 +207,13 @@ client.start(() => {
   }, 10000)
 })
 ```
+
+## Other features
+
+Since `NicordJS` is a wrapper over `DiscordJS`, if `NicordJS` functionality is not enough for you, you can
+import `DiscordJS` classes and types from `NicordJS`, since `NicordJS` inherits `DiscordJS`.
+
+## Credits
+
+[discord.js](https://www.npmjs.com/package/discord.js) - discord.js is a powerful Node.js module that allows you to
+easily interact with the Discord API.
