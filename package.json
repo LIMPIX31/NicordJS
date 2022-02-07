@@ -4,7 +4,7 @@
   "description": "Library for creating modern discord bots",
   "repository": "https://github.com/LIMPIX31/NicordJS.git",
   "author": "LIMPIX31",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "files": [
