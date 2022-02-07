@@ -149,7 +149,7 @@ export abstract class SlashCommandAutoBuilder {
   }
 
   private static applyNDR(field: SlashCommandField, option: SlashOption) {
-    option.setName(field.name).setRequired(field.required || true)
+    option.setName(field.name).setRequired(!!field.required)
     field.description && option.setDescription(field.description)
   }
 }
