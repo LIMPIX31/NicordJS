@@ -12,7 +12,7 @@ export const CreateBasicTemplate = async (
   token: string,
   guild?: string,
 ) => {
-  const workdir = path.join('C:\\Users\\DDK\\Desktop\\tests', project)
+  const workdir = path.join(process.cwd(), project)
   if (fsd.existsSync(workdir)) {
     console.log(chalk.red('Project already exists'))
     throw new Error('Project already exists')
