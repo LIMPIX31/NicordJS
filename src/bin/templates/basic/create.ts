@@ -7,7 +7,11 @@ import { commandsFile } from './files/commands.ts'
 import { tsconfig } from './files/tsconfig.json'
 import * as chalk from 'chalk'
 
-export const CreateBasicTemplate = async (project: string, token: string, guild?: string) => {
+export const CreateBasicTemplate = async (
+  project: string,
+  token: string,
+  guild?: string,
+) => {
   const workdir = path.join('C:\\Users\\DDK\\Desktop\\tests', project)
   if (fsd.existsSync(workdir)) {
     console.log(chalk.red('Project already exists'))
@@ -15,8 +19,14 @@ export const CreateBasicTemplate = async (project: string, token: string, guild?
   }
   await fs.mkdir(workdir)
   const packageJsonGenerated = packageJson.replaceAll('%PROJECT_NAME%', project)
-  const indexGenerated = indexFile.replaceAll('%TOKEN%', token)
-    .replaceAll('%GUILD_CODE%', guild ? `client.defaultGuild = '${guild}'\nclient.localSlashCommands()` : '')
+  const indexGenerated = indexFile
+    .replaceAll('%TOKEN%', token)
+    .replaceAll(
+      '%GUILD_CODE%',
+      guild
+        ? `client.defaultGuild = '${guild}'\nclient.localSlashCommands()`
+        : '',
+    )
   await fs.writeFile(path.join(workdir, 'package.json'), packageJsonGenerated)
   await fs.writeFile(path.join(workdir, 'tsconfig.json'), tsconfig)
   await fs.mkdir(path.join(workdir, 'src'))

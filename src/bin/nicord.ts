@@ -4,11 +4,10 @@ import { initProject } from './scripts/init'
 
 const { version } = require('../../package.json')
 
-program
-  .name('nicord')
-  .version(version)
+program.name('nicord').version(version)
 
-program.command('init')
+program
+  .command('init')
   .description('Initializes a new project')
   .action(async () => {
     await initProject()

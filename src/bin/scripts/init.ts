@@ -9,12 +9,12 @@ import * as path from 'path'
 
 enum Template {
   BASIC = 'Basic (Everything you need to start with the first line)',
-  ENTERPRISE = 'Enterprise (For commercial products and professionals) [soon]'
+  ENTERPRISE = 'Enterprise (For commercial products and professionals) [soon]',
 }
 
 enum Packman {
   NPM = 'npm',
-  YARN = 'yarn'
+  YARN = 'yarn',
 }
 
 const qs = [
@@ -22,18 +22,19 @@ const qs = [
     name: 'project',
     type: 'input',
     message: 'Project name:',
-    validate: function(input) {
+    validate: function (input) {
       if (/^([a-z\-_\d])+$/.test(input)) {
         if (!fs.existsSync(path.join(process.cwd(), input))) return true
         else return 'Project already exists'
-      } else return 'Project name may only include lowercase letters, numbers, underscores and hashes.'
+      } else
+        return 'Project name may only include lowercase letters, numbers, underscores and hashes.'
     },
   },
   {
     name: 'token',
     type: 'input',
     message: 'Bot token:',
-    validate: function(input) {
+    validate: function (input) {
       if (/^\w+\.\w+\.\w+$/.test(input)) return true
       else return 'Invalid token'
     },
@@ -58,19 +59,22 @@ const qs = [
   },
 ]
 
-
 export const initProject = async () => {
   const answers = await inquirer.prompt(qs)
   if (answers['private']) {
-    answers['guild'] = (await inquirer.prompt([{
-      name: 'guild',
-      type: 'input',
-      message: 'Guild id:',
-      validate: input => {
-        if (/^\d+$/.test(input) && input.length === 18) return true
-        else return 'Invalid guild id'
-      },
-    }]))['guild']
+    answers['guild'] = (
+      await inquirer.prompt([
+        {
+          name: 'guild',
+          type: 'input',
+          message: 'Guild id:',
+          validate: input => {
+            if (/^\d+$/.test(input) && input.length === 18) return true
+            else return 'Invalid guild id'
+          },
+        },
+      ])
+    )['guild']
   }
 
   const cls = new CliStage('Generating project', 'Installing dependencies')
@@ -80,7 +84,11 @@ export const initProject = async () => {
   switch (answers['template']) {
     case Template.BASIC:
       try {
-        workdir = await CreateBasicTemplate(answers['project'], answers['token'], answers['guild'])
+        workdir = await CreateBasicTemplate(
+          answers['project'],
+          answers['token'],
+          answers['guild'],
+        )
         cls.success()
       } catch (e) {
         console.log(chalk.red('Failed'))
@@ -89,7 +97,11 @@ export const initProject = async () => {
       }
       break
     case Template.ENTERPRISE:
-      console.log(chalk.red('\'Enterprise\' template is in development. Please use another template'))
+      console.log(
+        chalk.red(
+          "'Enterprise' template is in development. Please use another template",
+        ),
+      )
       return
   }
 
@@ -111,12 +123,11 @@ export const initProject = async () => {
     }
   }
   if (answers['packman'] === Packman.YARN)
-    exec('npm i yarn -g', { cwd: workdir }, (err) => {
+    exec('npm i yarn -g', { cwd: workdir }, err => {
       if (err) {
         cls.error(true)
         process.exit(0)
       } else installDeps()
     })
-  else
-    installDeps()
+  else installDeps()
 }
