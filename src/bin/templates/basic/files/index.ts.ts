@@ -1,6 +1,7 @@
 export const indexFile = `import { NicordClient, IntentsFlags } from 'nicord.js'
+import { MyCommands } from './commands'
 
-export const client = new NicordClient([
+const client = new NicordClient([
   IntentsFlags.GUILDS,
   IntentsFlags.GUILD_MESSAGES,
 ])
@@ -10,4 +11,5 @@ client.setToken('%TOKEN%')
 client.start(() => {
   console.log('Bot started!')
 })
-`
+
+client.addCommandListener(MyCommands)`
