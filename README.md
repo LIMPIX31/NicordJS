@@ -1,6 +1,10 @@
-# NicordJS
+<h1 align="center">NicordJS</h1>
 
-Modern library for create simple discord bots based on DiscordJS
+<p align="center">
+  <img src="https://i.imgur.com/4DmH7I9.png" width="256" height="256">
+</p>
+
+<p align="center">Modern library for create simple discord bots based on DiscordJS</p>
 
 ## CLI (Creating new project from a template)
 ```bash
