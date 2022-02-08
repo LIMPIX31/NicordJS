@@ -2,7 +2,16 @@
 
 Modern library for create simple discord bots based on DiscordJS
 
-## Installing
+## CLI (Creating new project from a template)
+```bash
+# install nicord.js globally
+npm i nicord.js -g
+# run this command in the project directory and
+# follow the instructions to create a new project
+nicord init
+```
+
+## Installing in project
 
 ```bash
 # using npm

@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "target": "ES2021",
     "module": "commonjs",
     "declaration": true,
     "outDir": "./lib",
@@ -10,8 +10,10 @@
     "noImplicitAny": false,
     "types": [
       "jest",
-      "reflect-metadata"
-    ]
+      "reflect-metadata",
+      "node"
+    ],
+    "allowSyntheticDefaultImports": true
   },
   "include": [
     "src"
