@@ -91,7 +91,6 @@ export const initProject = async () => {
         )
         cls.success()
       } catch (e) {
-        console.log(e)
         console.log(chalk.red('Failed'))
         cls.error(true)
         process.exit(0)
