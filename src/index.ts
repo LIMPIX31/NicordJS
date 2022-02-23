@@ -41,6 +41,9 @@ import { NicordPresence } from './nicord/presence/NicordPresence'
 import { NicordActivity } from './nicord/presence/NicordActivity'
 
 export * from 'discord.js'
+export * from '@discordjs/voice'
+export * from '@discordjs/builders'
+export * from '@discordjs/collection'
 
 export {
   NicordClient,
