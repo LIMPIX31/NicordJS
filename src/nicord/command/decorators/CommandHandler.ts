@@ -12,34 +12,20 @@ export type SlashCommandField<C = unknown, T = unknown> = {
 
 export type SlashCommandChoice<T> = [k: string, v: T]
 
-export type StringSlashCommandField = Omit<
-  SlashCommandField<string, 'string'>,
-  'type'
->
-export type NumberSlashCommandField = Omit<
-  SlashCommandField<number, 'number'>,
-  'type'
->
-export type IntegerSlashCommandField = Omit<
-  SlashCommandField<number, 'integer'>,
-  'type'
->
-export type UserSlashCommandField = Omit<
-  SlashCommandField<number, 'user'>,
-  'type'
->
-export type RoleSlashCommandField = Omit<
-  SlashCommandField<number, 'role'>,
-  'type'
->
-export type MentionableSlashCommandField = Omit<
-  SlashCommandField<number, 'mentionable'>,
-  'type'
->
-export type BooleanSlashCommandField = Omit<
-  SlashCommandField<boolean, 'boolean'>,
-  'choices' | 'type'
->
+export type StringSlashCommandField = Omit<SlashCommandField<string, 'string'>,
+  'type'>
+export type NumberSlashCommandField = Omit<SlashCommandField<number, 'number'>,
+  'type'>
+export type IntegerSlashCommandField = Omit<SlashCommandField<number, 'integer'>,
+  'type'>
+export type UserSlashCommandField = Omit<SlashCommandField<number, 'user'>,
+  'type'>
+export type RoleSlashCommandField = Omit<SlashCommandField<number, 'role'>,
+  'type'>
+export type MentionableSlashCommandField = Omit<SlashCommandField<number, 'mentionable'>,
+  'type'>
+export type BooleanSlashCommandField = Omit<SlashCommandField<boolean, 'boolean'>,
+  'choices' | 'type'>
 
 export type CommandOptions = Partial<{
   prefix: string
@@ -112,6 +98,7 @@ const addOption = (
   const options = getOptions(target, propertyKey) || {}
   const fields = options.fields || []
   option.type = type
+  option.name = option.name.toLowerCase()
   fields.unshift(option)
   assignMetadata(target, propertyKey, { fields: [...fields] })
 }
@@ -148,15 +135,15 @@ export const AdminOnly = (target, propertyKey?: string) => {
 
 export const WhitelistedRoles =
   (...roles: string[]) =>
-  (target, propertyKey?: string) => {
-    assignMetadata(target, propertyKey, { rolesWhitelist: roles })
-  }
+    (target, propertyKey?: string) => {
+      assignMetadata(target, propertyKey, { rolesWhitelist: roles })
+    }
 
 export const BlacklistedRoles =
   (...roles: string[]) =>
-  (target, propertyKey?: string) => {
-    assignMetadata(target, propertyKey, { rolesBlacklist: roles })
-  }
+    (target, propertyKey?: string) => {
+      assignMetadata(target, propertyKey, { rolesBlacklist: roles })
+    }
 
 export const StringOption =
   (option: StringSlashCommandField) => (target, propertyKey) => {
@@ -200,9 +187,9 @@ export const Subcommands =
 
 export const RequiredPermissions =
   (...permissions: NicordPermissions[]) =>
-  (target, propertyKey) => {
-    assignMetadata(target, propertyKey, { permissions })
-  }
+    (target, propertyKey) => {
+      assignMetadata(target, propertyKey, { permissions })
+    }
 
 export const Global = (target, propertyKey) => {
   assignMetadata(target, propertyKey, { global: true })
@@ -214,10 +201,10 @@ export const UseGuard = (fn: Function) => (target, propertyKey) => {
 
 export const UsePreset =
   (...presets: CommandOptions[]) =>
-  (target, propertyKey) => {
-    assignMetadata(target, propertyKey, {
-      ...presets.reduce((p, c) => {
-        return Object.assign({}, p, c)
-      }),
-    })
-  }
+    (target, propertyKey) => {
+      assignMetadata(target, propertyKey, {
+        ...presets.reduce((p, c) => {
+          return Object.assign({}, p, c)
+        }),
+      })
+    }
