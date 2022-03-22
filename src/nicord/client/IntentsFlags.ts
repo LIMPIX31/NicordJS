@@ -1,4 +1,5 @@
 export enum IntentsFlags {
+  'ALL' = 'ALL',
   'GUILDS' = 'GUILDS',
   'GUILD_MEMBERS' = 'GUILD_MEMBERS',
   'GUILD_BANS' = 'GUILD_BANS',
