@@ -54,7 +54,7 @@
     "chalk": "^4.1.2",
     "cli-stage": "^1.0.1",
     "commander": "^9.0.0",
-    "discord-api-types": "^0.26.1",
+    "discord-api-types": "^0.29.0",
     "discord.js": "^13.6.0",
     "inquirer": "^8.2.0",
     "reflect-metadata": "^0.1.13"
