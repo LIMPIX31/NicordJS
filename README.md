@@ -6,6 +6,8 @@
 
 <p align="center">Modern library for create simple discord bots based on DiscordJS</p>
 
+[English](https://github.com/LIMPIX31/NicordJS#readme) | [Русский](https://github.com/LIMPIX31/NicordJS/blob/master/README.ru.md)
+
 ## CLI (Creating new project from a template)
 ```bash
 # install nicord.js globally
