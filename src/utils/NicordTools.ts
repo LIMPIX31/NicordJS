@@ -13,8 +13,4 @@ export abstract class NicordTools {
   static isSlashListener(Listener: CommandListener) {
     return Reflect.hasMetadata(MetadataKeys.isSlash, Listener.prototype)
   }
-
-  static applyDefaults<T>(input: T, defaults: T): T {
-    return Object.assign({}, defaults, input)
-  }
 }
