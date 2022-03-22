@@ -6,6 +6,8 @@
 
 <p align="center">Современная библиотека для создания дискорд ботов на основе DiscordJS</p>
 
+[English](https://github.com/LIMPIX31/NicordJS#readme) | [Русский](https://github.com/LIMPIX31/NicordJS/blob/master/README.ru.md)
+
 ## CLI (Создание готового шаблона)
 
 ```bash
