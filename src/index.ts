@@ -39,6 +39,7 @@ import { NicordMiddleware } from './types/NicordMiddleware'
 import { NicordCommandError } from './nicord/NicordCommandError'
 import { NicordPresence } from './nicord/presence/NicordPresence'
 import { NicordActivity } from './nicord/presence/NicordActivity'
+import { ChannelProxy } from './nicord/ChannelProxy'
 
 export * from 'discord.js'
 export * from '@discordjs/voice'
@@ -85,4 +86,5 @@ export {
   UseGuard,
   NicordPresence,
   NicordActivity,
+  ChannelProxy
 }

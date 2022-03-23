@@ -17,6 +17,7 @@ import { Routes } from 'discord-api-types/v9'
 import { NicordCommandInteraction } from '../interaction/NicordCommandInteraction'
 import { NicordButtonInteraction } from '../interaction/NicordButtonInteraction'
 import { NicordPresence } from '../presence/NicordPresence'
+import { ChannelProxy } from '../ChannelProxy'
 
 export type ButtonOnclickType = (
   interaction: NicordButtonInteraction,
@@ -46,7 +47,7 @@ export class NicordClient extends Client {
     flags: IntentsFlags[] = [IntentsFlags.GUILDS, IntentsFlags.GUILD_MESSAGES],
   ) {
     super({
-      intents: [flags.map(flag => Intents.FLAGS[flag])],
+      intents: flags.includes(IntentsFlags.ALL) ? Object.values(Intents.FLAGS) : [flags.map(flag => Intents.FLAGS[flag])],
     })
   }
 
@@ -232,4 +233,9 @@ export class NicordClient extends Client {
       'Value must be valid command listener. Check if you are using the right decorator.',
     )
   }
+
+  useProxy(proxy: ChannelProxy) {
+    proxy.bindClient(this)
+  }
+
 }
