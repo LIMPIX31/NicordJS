@@ -223,6 +223,45 @@ client.start(() => {
 })
 ```
 
+## Channel Proxying
+You can send messages on behalf of your bot and broadcast messages from other channels
+```ts
+// We will need Firebase. It's not necessary,
+// but if you want to be able to edit proxied messages and 
+// have more accurate webhook synchronization, 
+// we need to plug it into the project
+
+// Place your firebase private key in the project
+// You can get it here: https://console.firebase.google.com/project/_/settings/serviceaccounts/adminsdk
+import creds from './firebase-adminsdk.json'
+
+export const client = new NicordClient([
+  IntentsFlags.ALL
+])
+
+const firebaseConfig = {
+    // Firebase app config
+};
+
+client.setToken('ODc1Njk4NDY4OTg1OTI5Nzc4.YRZTwA.***************************')
+// Connecting firebase to the client
+client.setFirebase(firebaseConfig, creds)
+
+// Define the capture channel
+// (From here, your messages will be redirected to the destination channel on behalf of the botа)
+const captureChannel = '955901635895394324'
+// Define the destination channel
+// From here, messages from other users will be forwarded to the interception channel on behalf of webhooks
+const destinationChannel = '786861708487557163'
+
+client.start(async () => {
+  console.log('Bot started!')
+  // Create and run a proxy.
+  client.useProxy(new ChannelProxy(captureChannel, destinationChannel))
+})
+
+```
+
 ## Other features
 
 Since `NicordJS` is a wrapper over `DiscordJS`, if `NicordJS` functionality is not enough for you, you can

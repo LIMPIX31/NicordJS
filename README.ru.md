@@ -228,6 +228,45 @@ client.start(() => {
 })
 ```
 
+## Проксирование канала
+Вы можете отправлять сообщения от имени вашего бота и транслировать сообщения из других каналов 
+
+```ts
+// Нам понадобится Firebase. Это не обязательно, но если вы хотите
+// иметь возможность редактировать проксированные сообщения и
+// более точную синхронизацию вебхуков, нам нужно его подключить в проект
+
+// Поместите ваш приватный ключ firebase в проект
+// Получить его можно тут: https://console.firebase.google.com/project/_/settings/serviceaccounts/adminsdk
+import creds from './firebase-adminsdk.json'
+
+export const client = new NicordClient([
+  IntentsFlags.ALL
+])
+
+const firebaseConfig = {
+  // Конфигурация вашего приложения Firebase
+};
+
+client.setToken('ODc1Njk4NDY4OTg1OTI5Nzc4.YRZTwA.***************************')
+// Подключаем firebase к клиенту
+client.setFirebase(firebaseConfig, creds)
+
+// Определяем канал перехвата
+// (отсюда ваши сообщения будут перенаправлятся в канал назначения от имени бота)
+const captureChannel = '955901635895394324'
+// Определяем канал назначения
+// Отсюда сообщения других пользователей будут перенаправлены в канал перехвата от имени вебхуков
+const destinationChannel = '786861708487557163'
+
+client.start(async () => {
+  console.log('Bot started!')
+  // Создаём и запускаем прокси.
+  client.useProxy(new ChannelProxy(captureChannel, destinationChannel))
+})
+
+```
+
 ## Сторонние возможности
 
 Так как `NicordJS` это обёртка над `DiscordJS`, если функциональности `NicordJS` недостаточно, вы можете импортировать классы и типы `DiscordJS` из `NicordJS`, так как `NicordJS` наследует `DiscordJS`.
