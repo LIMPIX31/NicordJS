@@ -1,4 +1,4 @@
-import { Client, Intents } from 'discord.js'
+import { Client, Intents, PartialTypes } from 'discord.js'
 import { IntentsFlags } from './IntentsFlags'
 import { NicordClientException } from '../../exceptions/NicordClient.exception'
 import { CommandListener } from '../../types/CommandListener'
@@ -42,12 +42,15 @@ export class NicordClient extends Client {
   private defaultGuildId: string | undefined
   private localCommands: boolean = false
   private npresence: NicordPresence = new NicordPresence()
+  private firebaseApp?: App
+  private firestore?: Firestore
 
   constructor(
     flags: IntentsFlags[] = [IntentsFlags.GUILDS, IntentsFlags.GUILD_MESSAGES],
   ) {
     super({
       intents: flags.includes(IntentsFlags.ALL) ? Object.values(Intents.FLAGS) : [flags.map(flag => Intents.FLAGS[flag])],
+      partials: ['USER', 'CHANNEL', 'REACTION', 'MESSAGE', 'GUILD_MEMBER', 'GUILD_SCHEDULED_EVENT'],
     })
   }
 
