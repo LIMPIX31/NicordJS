@@ -18,6 +18,9 @@ import { NicordCommandInteraction } from '../interaction/NicordCommandInteractio
 import { NicordButtonInteraction } from '../interaction/NicordButtonInteraction'
 import { NicordPresence } from '../presence/NicordPresence'
 import { ChannelProxy } from '../ChannelProxy'
+import { initializeApp, App } from 'firebase-admin/app'
+import admin from 'firebase-admin'
+import { Firestore, getFirestore } from 'firebase-admin/firestore'
 
 export type ButtonOnclickType = (
   interaction: NicordButtonInteraction,
@@ -239,6 +242,25 @@ export class NicordClient extends Client {
 
   useProxy(proxy: ChannelProxy) {
     proxy.bindClient(this)
+  }
+
+  setFirebase(config: Object, credentials: Object) {
+    this.firebaseApp = initializeApp({
+      ...config,
+      credential: admin.credential.cert(credentials),
+    })
+  }
+
+  getFirebase(): App | undefined {
+    return this.firebaseApp
+  }
+
+  getFirestore(): Firestore | undefined {
+    if (this.firestore) return this.firestore
+    else {
+      this.firestore = getFirestore(this.getFirebase())
+      return this.firestore
+    }
   }
 
 }
