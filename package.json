@@ -1,6 +1,6 @@
 {
   "name": "nicord.js",
-  "version": "1.2.3",
+  "version": "1.5.0-beta.1",
   "description": "Library for creating modern discord bots",
   "repository": "https://github.com/LIMPIX31/NicordJS.git",
   "author": "LIMPIX31",
@@ -56,6 +56,8 @@
     "commander": "^9.0.0",
     "discord-api-types": "^0.29.0",
     "discord.js": "^13.6.0",
+    "firebase": "^9.6.9",
+    "firebase-admin": "^10.0.2",
     "inquirer": "^8.2.0",
     "reflect-metadata": "^0.1.13"
   }
