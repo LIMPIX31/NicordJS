@@ -52,8 +52,17 @@ export class NicordClient extends Client {
     flags: IntentsFlags[] = [IntentsFlags.GUILDS, IntentsFlags.GUILD_MESSAGES],
   ) {
     super({
-      intents: flags.includes(IntentsFlags.ALL) ? Object.values(Intents.FLAGS) : [flags.map(flag => Intents.FLAGS[flag])],
-      partials: ['USER', 'CHANNEL', 'REACTION', 'MESSAGE', 'GUILD_MEMBER', 'GUILD_SCHEDULED_EVENT'],
+      intents: flags.includes(IntentsFlags.ALL)
+        ? Object.values(Intents.FLAGS)
+        : [flags.map(flag => Intents.FLAGS[flag])],
+      partials: [
+        'USER',
+        'CHANNEL',
+        'REACTION',
+        'MESSAGE',
+        'GUILD_MEMBER',
+        'GUILD_SCHEDULED_EVENT',
+      ],
     })
   }
 
@@ -262,5 +271,4 @@ export class NicordClient extends Client {
       return this.firestore
     }
   }
-
 }

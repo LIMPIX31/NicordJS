@@ -8,28 +8,36 @@ import { DocumentData, QueryDocumentSnapshot } from 'firebase-admin/firestore'
 const colname = 'idcomparisons'
 
 export class ChannelProxy {
-
   private client?: NicordClient
   private comparisons: Record<Snowflake, Snowflake> = {}
 
+  constructor(private captureChannelId: string, private destination: string) {}
 
-  constructor(private captureChannelId: string, private destination: string) {
-
-  }
-
-  private async getWebhook(client: NicordClient, user: User, channel: TextChannel): Promise<Webhook> {
+  private async getWebhook(
+    client: NicordClient,
+    user: User,
+    channel: TextChannel,
+  ): Promise<Webhook> {
     return await new ShadowUser(client, { user, channel }).get()
   }
 
-  private async getDestinationChannel(client: NicordClient): Promise<TextChannel> {
+  private async getDestinationChannel(
+    client: NicordClient,
+  ): Promise<TextChannel> {
     const channel = await client.channels.fetch(this.destination)
-    if (!(channel instanceof TextChannel)) throw new NicordClientException('Proxy destination channel must be existent TextChannel')
+    if (!(channel instanceof TextChannel))
+      throw new NicordClientException(
+        'Proxy destination channel must be existent TextChannel',
+      )
     return channel
   }
 
   private async getCaptureChannel(client: NicordClient): Promise<TextChannel> {
     const channel = await client.channels.fetch(this.captureChannelId)
-    if (!(channel instanceof TextChannel)) throw new NicordClientException('Proxy capture channel must be existent TextChannel')
+    if (!(channel instanceof TextChannel))
+      throw new NicordClientException(
+        'Proxy capture channel must be existent TextChannel',
+      )
     return channel
   }
 
@@ -40,7 +48,7 @@ export class ChannelProxy {
    */
   bindClient(client: NicordClient) {
     this.client = client
-    client.on('messageCreate', async (e) => {
+    client.on('messageCreate', async e => {
       if (e.author.bot) return
       if (e.channelId === this.destination) {
         const captureChannel = await this.getCaptureChannel(client)
@@ -59,21 +67,28 @@ export class ChannelProxy {
       if (e.author?.bot) return
       if (e.channelId === this.captureChannelId) {
         const destination = await this.getDestinationChannel(client)
-        const bmessage = await destination.messages.fetch(await this.getCom(e.id))
+        const bmessage = await destination.messages.fetch(
+          await this.getCom(e.id),
+        )
         await bmessage.edit(NicordTools.pipeMessage(e))
       }
       if (e.channelId === this.destination) {
         const captureChannel = await this.getCaptureChannel(client)
         const webhook = await this.getWebhook(client, e.author, captureChannel)
-        await webhook.editMessage(await this.getCom(e.id), NicordTools.pipeMessage(e))
+        await webhook.editMessage(
+          await this.getCom(e.id),
+          NicordTools.pipeMessage(e),
+        )
       }
     })
-    client.on('messageDelete', async (e) => {
+    client.on('messageDelete', async e => {
       if (e.partial) e = await e.fetch()
       if (e.author?.bot) return
       if (e.channelId === this.captureChannelId) {
         const destination = await this.getDestinationChannel(client)
-        const bmessage = await destination.messages.fetch(await this.getCom(e.id))
+        const bmessage = await destination.messages.fetch(
+          await this.getCom(e.id),
+        )
         await bmessage.delete()
       }
       if (e.channelId === this.destination) {
@@ -97,9 +112,13 @@ export class ChannelProxy {
   async removeCom(idc: Snowflake) {
     const db = this.client?.getFirestore()
     if (db) {
-      await db.collection(colname).where('f', '==', idc).get().then((qs) => {
-        qs.forEach(doc => doc.ref.delete())
-      })
+      await db
+        .collection(colname)
+        .where('f', '==', idc)
+        .get()
+        .then(qs => {
+          qs.forEach(doc => doc.ref.delete())
+        })
     } else {
       delete this.comparisons[idc]
     }
@@ -108,11 +127,17 @@ export class ChannelProxy {
   async getCom(idc: Snowflake): Promise<Snowflake> {
     const db = this.client?.getFirestore()
     if (db) {
-      return db.collection(colname).where('f', '==', idc).get().then(res => new Promise<QueryDocumentSnapshot>(r => res.forEach(doc => r(doc)))).then(res => res.data().t)
+      return db
+        .collection(colname)
+        .where('f', '==', idc)
+        .get()
+        .then(
+          res =>
+            new Promise<QueryDocumentSnapshot>(r => res.forEach(doc => r(doc))),
+        )
+        .then(res => res.data().t)
     } else {
       return this.comparisons[idc]
     }
   }
-
-
 }
