@@ -75,13 +75,11 @@ export class ShadowUser {
         webhookOpts,
       )
       if (db)
-        await db
-          .collection(colname)
-          .add({
-            userId: user.id,
-            token: newWebhook.token,
-            channelId: channel.id,
-          })
+        await db.collection(colname).add({
+          userId: user.id,
+          token: newWebhook.token,
+          channelId: channel.id,
+        })
       return newWebhook
     }
   }
