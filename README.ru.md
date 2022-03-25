@@ -40,7 +40,9 @@ const client = new NicordClient([
   IntentsFlags.GUILDS,
   IntentsFlags.GUILD_MESSAGES,
 ])
-
+  
+// Включаем логгирование
+client.debug()
 // Устанавливаем токен бота
 client.setToken('OTM2MjgxNjE4Njk4NjA0NjU0.YfK6NQ.OhB2n8eguXByq22************')
 // Указываем id гильдии(сервера) если ваш бот приватный
@@ -51,7 +53,7 @@ client.defaultGuild = '9362818051********'
 client.localSlashCommands()
 // Запускаем клиент (можно подождать с помощью await)
 client.start(() => {
-  console.log('Started!')
+  // Тут можно выполнять любые действия при старте клиента
 })
 
 // Объявляем класс как слушатель слэш команд
@@ -234,6 +236,29 @@ client.start(() => {
   setTimeout(() => {
     presence.idle()
   }, 10000)
+})
+```
+
+## Затенение
+Вы можете создать вебхук в точности повторяющий указанного пользователя, это даёт возможность делать очень интересные вещи.
+Настройте Firebase, чтобы более детально синхронизировать вебхуки и не допустить их дублирования
+```ts
+const shadowUser = new ShadowUser(client, {user, channel})
+const webhook = await shadowUser.get()
+```
+
+## Пример затенения
+Настройте затенение сообщений у вас на сервере, чтобы иметь возможность отправлять встраивания
+
+```ts
+client.useMiddleware<NicordMessage>('message', async (msg) => {
+  const embeds = EmbedParser(msg.content)
+  if (embeds.length > 0) {
+    await msg.delete()
+    if(!(msg.channel instanceof TextChannel)) return msg
+    const webhook = await new ShadowUser(client, { user: msg.author, channel: msg.channel }).get()
+    await webhook.send({ embeds })
+  }
 })
 ```
 

@@ -38,6 +38,8 @@ const client = new NicordClient([
   IntentsFlags.GUILD_MESSAGES,
 ])
 
+// Enable logging
+client.debug()
 // Set bot token
 client.setToken('OTM2MjgxNjE4Njk4NjA0NjU0.YfK6NQ.OhB2n8eguXByq22************')
 // Set guild id for local slash commands
@@ -46,7 +48,7 @@ client.defaultGuild = '9362818051********'
 client.localSlashCommands()
 // Start client (can be awaited)
 client.start(() => {
-  console.log('Started!')
+  // Here you can perform any action at the start of the client
 })
 
 // Declares the class as a listener of slash commands
@@ -229,6 +231,29 @@ client.start(() => {
   setTimeout(() => {
     presence.idle()
   }, 10000)
+})
+```
+
+## Shadowing
+You can create a webhook exactly like the user you specify, which makes it possible to do very interesting things.
+Configure Firebase to synchronize webhooks in more detail and prevent duplication
+```ts
+const shadowUser = new ShadowUser(client, {user, channel})
+const webhook = await shadowUser.get()
+```
+
+## Shadowing example
+Set up message shading on your server to be able to send embeds
+
+```ts
+client.useMiddleware<NicordMessage>('message', async (msg) => {
+  const embeds = EmbedParser(msg.content)
+  if (embeds.length > 0) {
+    await msg.delete()
+    if(!(msg.channel instanceof TextChannel)) return msg
+    const webhook = await new ShadowUser(client, { user: msg.author, channel: msg.channel }).get()
+    await webhook.send({ embeds })
+  }
 })
 ```
 
