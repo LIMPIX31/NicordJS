@@ -82,5 +82,4 @@ describe('EmbedParser', () => {
     }
     expect(err).toBeInstanceOf(EmbedParseException)
   })
-
 })

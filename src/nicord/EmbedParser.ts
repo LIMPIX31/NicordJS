@@ -4,9 +4,11 @@ import * as YAML from 'yaml'
 
 type EmbedLike = string
 
-const embedFindRegexp = /embed```(?<format>(json|yml|yaml))(?<code>(.|\s)+?)```/g
+const embedFindRegexp =
+  /embed```(?<format>(json|yml|yaml))(?<code>(.|\s)+?)```/g
 
-export const toCorrectJson = (rjson?: string) => rjson?.replace(/(['"])?([a-z0-9A-Z_]+)(['"])?:/g, '"$2": ')
+export const toCorrectJson = (rjson?: string) =>
+  rjson?.replace(/(['"])?([a-z0-9A-Z_]+)(['"])?:/g, '"$2": ')
 
 export const parseRelaxedJson = <T = any>(rjson?: string): T => {
   try {
@@ -21,7 +23,10 @@ export const parseRelaxedJson = <T = any>(rjson?: string): T => {
 }
 
 export const EmbedParser = (input: EmbedLike): MessageEmbedOptions[] => {
-  const rawEmbeds = Array.from(input.matchAll(embedFindRegexp)).map(v => [v.groups?.format, v.groups?.code])
+  const rawEmbeds = Array.from(input.matchAll(embedFindRegexp)).map(v => [
+    v.groups?.format,
+    v.groups?.code,
+  ])
   const embedOptions: MessageEmbedOptions[] = []
   for (const [format, embed] of rawEmbeds) {
     if (format === 'json') {

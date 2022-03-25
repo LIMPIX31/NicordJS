@@ -75,7 +75,12 @@ export class NicordClient extends Client {
   }
 
   log(message: string) {
-    if (this._debug) message.split('\n').forEach(m => console.log(chalk.blue.bold('NICORDJS') + chalk.reset(` ${m}`)))
+    if (this._debug)
+      message
+        .split('\n')
+        .forEach(m =>
+          console.log(chalk.blue.bold('NICORDJS') + chalk.reset(` ${m}`)),
+        )
   }
 
   set clientId(clientId: string) {
@@ -267,7 +272,9 @@ export class NicordClient extends Client {
           if (runResult === 'REJECT') throw new Error('Middleware rejected')
           if (runResult) value = runResult
         } catch (e) {
-          this.log(chalk.yellow + `One of middlewares throw an exception: \n${e}`)
+          this.log(
+            chalk.yellow + `One of middlewares throw an exception: \n${e}`,
+          )
         }
       }
     }

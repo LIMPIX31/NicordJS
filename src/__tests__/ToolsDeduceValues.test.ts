@@ -17,7 +17,8 @@ describe('Tools.deduceValues', () => {
     const values = [0, 1, 2, 3, 4, 5]
     const whitelist = [1, 2, 3]
     const blacklist = [2]
-    expect(NicordTools.deduceValues(values, blacklist, whitelist)).toEqual([1, 3])
+    expect(NicordTools.deduceValues(values, blacklist, whitelist)).toEqual([
+      1, 3,
+    ])
   })
-
 })

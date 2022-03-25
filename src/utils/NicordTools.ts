@@ -2,10 +2,10 @@ import { CommandListener } from '../types/CommandListener'
 import 'reflect-metadata'
 import { MetadataKeys } from './MetadataKeys'
 import {
-  Collection, GuildMemberRoleManager,
+  Collection,
   Message,
   MessageAttachment,
-  MessageOptions, Permissions, Role,
+  MessageOptions,
 } from 'discord.js'
 import { NicordMessage } from '../nicord/NicordMessage'
 
@@ -24,7 +24,11 @@ export abstract class NicordTools {
   static pipeAttachments(
     attachments: Collection<string, MessageAttachment> | MessageAttachment[],
   ): MessageAttachment[] {
-    return (attachments.map as (fn: (value: MessageAttachment) => MessageAttachment) => MessageAttachment[])(
+    return (
+      attachments.map as (
+        fn: (value: MessageAttachment) => MessageAttachment,
+      ) => MessageAttachment[]
+    )(
       v =>
         new MessageAttachment(v.attachment, v.name ?? undefined, {
           id: v.id,
@@ -58,15 +62,8 @@ export abstract class NicordTools {
   }
 
   static deduceValues<T>(values: T[], blacklist?: T[] | null, whitelist?: T[]) {
-    if (blacklist)
-      values = values.filter(
-        v => !blacklist.includes(v),
-      )
-    if (whitelist)
-      values = values.filter(v =>
-        whitelist.includes(v),
-      )
+    if (blacklist) values = values.filter(v => !blacklist.includes(v))
+    if (whitelist) values = values.filter(v => whitelist.includes(v))
     return values
   }
-
 }

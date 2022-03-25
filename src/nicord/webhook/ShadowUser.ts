@@ -1,5 +1,10 @@
 import { NicordClient } from '../client/NicordClient'
-import { ChannelWebhookCreateOptions, TextChannel, User, Webhook } from 'discord.js'
+import {
+  ChannelWebhookCreateOptions,
+  TextChannel,
+  User,
+  Webhook,
+} from 'discord.js'
 import { NicordClientException } from '../../exceptions/NicordClient.exception'
 
 const colname = 'webhookUsers'
@@ -47,9 +52,7 @@ export class ShadowUser {
             .where('userId', '==', user.id)
             .where('channelId', '==', channel.id)
             .get()
-            .then(
-              res => res[0],
-            )
+            .then(res => res[0])
             .then(res => res?.data().token)
           const dbFindResult = webhooks.find(w => w.token === token)
           if (dbFindResult) {
@@ -71,7 +74,9 @@ export class ShadowUser {
           token: newWebhook.token,
           channelId: channel.id,
         })
-      this.client.log(`Webhooking [${user.username}#${user.discriminator}/${user.id}] in (${channel.name}/${channel.id})`)
+      this.client.log(
+        `Webhooking [${user.username}#${user.discriminator}/${user.id}] in (${channel.name}/${channel.id})`,
+      )
       return newWebhook
     }
   }

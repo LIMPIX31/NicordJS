@@ -12,8 +12,7 @@ import { NicordSlashCommand } from './NicordSlashCommand'
 import { NicordCommandError } from '../NicordCommandError'
 
 export class NicordCommandHandler {
-  constructor(private fn: Function, private options: CommandOptions) {
-  }
+  constructor(private fn: Function, private options: CommandOptions) {}
 
   get prefix(): string {
     return this.options.prefix || '!'
@@ -125,7 +124,9 @@ export class NicordCommandHandler {
       let allowed = false
       const guild = await msg.guild
       if (guild) {
-        let allowedRoles = NicordTools.deduceValues(guild.roles.cache.map(role => role.id))
+        let allowedRoles = NicordTools.deduceValues(
+          guild.roles.cache.map(role => role.id),
+        )
         if (
           msg.member &&
           msg.member.roles instanceof GuildMemberRoleManager &&
