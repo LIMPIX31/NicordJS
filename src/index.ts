@@ -40,6 +40,7 @@ import { NicordCommandError } from './nicord/NicordCommandError'
 import { NicordPresence } from './nicord/presence/NicordPresence'
 import { NicordActivity } from './nicord/presence/NicordActivity'
 import { ChannelProxy } from './nicord/ChannelProxy'
+import { EmbedParser } from './nicord/EmbedParser'
 import { ShadowUser, ShadowUserOptions } from './nicord/webhook/ShadowUser'
 
 export * from 'discord.js'
@@ -90,4 +91,5 @@ export {
   ChannelProxy,
   ShadowUser,
   ShadowUserOptions,
+  EmbedParser,
 }
