@@ -132,8 +132,7 @@ export class ChannelProxy {
         .where('f', '==', idc)
         .get()
         .then(
-          res =>
-            new Promise<QueryDocumentSnapshot>(r => res.forEach(doc => r(doc))),
+          res => res[0]
         )
         .then(res => res.data().t)
     } else {
