@@ -1,12 +1,6 @@
 import { NicordClient } from '../client/NicordClient'
-import {
-  ChannelWebhookCreateOptions,
-  TextChannel,
-  User,
-  Webhook,
-} from 'discord.js'
+import { ChannelWebhookCreateOptions, TextChannel, User, Webhook } from 'discord.js'
 import { NicordClientException } from '../../exceptions/NicordClient.exception'
-import { QueryDocumentSnapshot } from 'firebase-admin/lib/firestore'
 
 const colname = 'webhookUsers'
 
@@ -54,12 +48,9 @@ export class ShadowUser {
             .where('channelId', '==', channel.id)
             .get()
             .then(
-              res =>
-                new Promise<QueryDocumentSnapshot>(r =>
-                  res.forEach(doc => r(doc)),
-                ),
+              res => res[0],
             )
-            .then(res => res.data().token)
+            .then(res => res?.data().token)
           const dbFindResult = webhooks.find(w => w.token === token)
           if (dbFindResult) {
             if (userAvatar) dbFindResult.avatar = userAvatar
