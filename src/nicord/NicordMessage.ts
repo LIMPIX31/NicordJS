@@ -6,7 +6,7 @@ import {
   Guild,
   GuildMember,
   Message,
-  MessageActionRow,
+  MessageActionRow, MessageAttachment,
   MessageEmbed,
   MessagePayload,
   MessageReaction,
@@ -43,6 +43,10 @@ export class NicordMessage extends OriginalShadow<Message> {
 
   get member(): GuildMember | null {
     return this.original.member
+  }
+
+  get attachments(): MessageAttachment[] {
+    return this.original.attachments.map(v => v)
   }
 
   static from(message: Message): NicordMessage {
