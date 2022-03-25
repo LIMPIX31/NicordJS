@@ -131,9 +131,7 @@ export class ChannelProxy {
         .collection(colname)
         .where('f', '==', idc)
         .get()
-        .then(
-          res => res[0]
-        )
+        .then(res => res[0])
         .then(res => res.data().t)
     } else {
       return this.comparisons[idc]
