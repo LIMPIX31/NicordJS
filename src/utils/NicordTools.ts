@@ -7,6 +7,7 @@ import {
   MessageAttachment,
   MessageOptions, Permissions, Role,
 } from 'discord.js'
+import { NicordMessage } from '../nicord/NicordMessage'
 
 export abstract class NicordTools {
   static isCommandListener(Listener: CommandListener) {
@@ -21,9 +22,9 @@ export abstract class NicordTools {
   }
 
   static pipeAttachments(
-    attachments: Collection<string, MessageAttachment>,
+    attachments: Collection<string, MessageAttachment> | MessageAttachment[],
   ): MessageAttachment[] {
-    return attachments.map(
+    return (attachments.map as (fn: (value: MessageAttachment) => MessageAttachment) => MessageAttachment[])(
       v =>
         new MessageAttachment(v.attachment, v.name ?? undefined, {
           id: v.id,
@@ -40,14 +41,19 @@ export abstract class NicordTools {
     )
   }
 
-  static pipeMessage(message: Message): MessageOptions {
+  static pipeMessage(message: Message | NicordMessage): MessageOptions {
     const pipedMessage: MessageOptions = {}
     if (message.content.length > 0) pipedMessage.content = message.content
     if (message.embeds.length > 0) pipedMessage.embeds = message.embeds
     if (message.components.length > 0)
       pipedMessage.components = message.components
-    if (message.attachments.size > 0)
-      pipedMessage.files = NicordTools.pipeAttachments(message.attachments)
+    if (message instanceof Message) {
+      if (message.attachments.size > 0)
+        pipedMessage.files = NicordTools.pipeAttachments(message.attachments)
+    } else {
+      if (message.attachments.length > 0)
+        pipedMessage.files = NicordTools.pipeAttachments(message.attachments)
+    }
     return pipedMessage
   }
 
