@@ -2,6 +2,7 @@
  * <h1>NicordMessage</h1>
  */
 import {
+  Collection,
   EmojiIdentifierResolvable,
   Guild,
   GuildMember,
@@ -15,6 +16,7 @@ import {
   User,
 } from 'discord.js'
 import { OriginalShadow } from '../utils/OriginalShadow'
+import { NicordTools } from '../utils/NicordTools'
 
 export class NicordMessage extends OriginalShadow<Message> {
   get author(): User {
@@ -33,12 +35,24 @@ export class NicordMessage extends OriginalShadow<Message> {
     return this.original.content
   }
 
+  set content(content: string) {
+    this.original.content = content
+  }
+
   get embeds(): MessageEmbed[] {
     return this.original.embeds
   }
 
+  set embeds(embeds: MessageEmbed[]) {
+    this.original.embeds = embeds
+  }
+
   get components(): MessageActionRow[] {
     return this.original.components
+  }
+
+  set components(components: MessageActionRow[]) {
+    this.original.components = components
   }
 
   get member(): GuildMember | null {
