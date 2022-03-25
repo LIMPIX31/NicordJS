@@ -71,6 +71,7 @@ export class ShadowUser {
           token: newWebhook.token,
           channelId: channel.id,
         })
+      this.client.log(`Webhooking [${user.username}#${user.discriminator}/${user.id}] in (${channel.name}/${channel.id})`)
       return newWebhook
     }
   }

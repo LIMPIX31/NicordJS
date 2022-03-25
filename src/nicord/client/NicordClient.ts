@@ -21,6 +21,7 @@ import { ChannelProxy } from '../ChannelProxy'
 import { App, initializeApp } from 'firebase-admin/app'
 import admin from 'firebase-admin'
 import { Firestore, getFirestore } from 'firebase-admin/firestore'
+import * as chalk from 'chalk'
 
 export type ButtonOnclickType = (
   interaction: NicordButtonInteraction,
@@ -47,6 +48,7 @@ export class NicordClient extends Client {
   private npresence: NicordPresence = new NicordPresence()
   private firebaseApp?: App
   private firestore?: Firestore
+  private _debug: boolean = false
 
   constructor(
     flags: IntentsFlags[] = [IntentsFlags.GUILDS, IntentsFlags.GUILD_MESSAGES],
@@ -67,6 +69,14 @@ export class NicordClient extends Client {
   }
 
   private _clientId: string | undefined
+
+  debug() {
+    this._debug = true
+  }
+
+  log(message: string) {
+    if (this._debug) message.split('\n').forEach(m => console.log(chalk.blue.bold('NICORDJS') + chalk.reset(` ${m}`)))
+  }
 
   set clientId(clientId: string) {
     this._clientId = clientId
@@ -134,6 +144,11 @@ export class NicordClient extends Client {
         )
       }
       this.started = true
+      process.on('SIGINT', () => {
+        this.log(chalk.red('Shutting down client'))
+        process.exit(0)
+      })
+      this.log(chalk.green('Client started'))
       onReady && onReady()
     } else {
       throw new NicordClientException(
@@ -247,9 +262,13 @@ export class NicordClient extends Client {
   ): Promise<NicordMiddlewareReturnType<T>> {
     for (const mw of this.middlewares) {
       if (mw.type === type) {
-        const runResult = await mw.middleware(value)
-        if (runResult === 'REJECT') throw new Error('Middleware rejected')
-        if (runResult) value = runResult
+        try {
+          const runResult = await mw.middleware(value)
+          if (runResult === 'REJECT') throw new Error('Middleware rejected')
+          if (runResult) value = runResult
+        } catch (e) {
+          this.log(chalk.yellow + `One of middlewares throw an exception: \n${e}`)
+        }
       }
     }
     return value
