@@ -190,9 +190,18 @@ client.registerButton('saydm', (interaction) => {
 Thinking about message logging or filtering unwanted content? Use middlewares
 
 ```ts
-client.useMiddleware('message', (entity) => {
-  console.log((entity as NicordMessage).content)
-  return entity
+client.useMiddleware<NicordMessage>('message', (msg) => {
+  console.log(msg.content)
+})
+
+client.useMiddleware<NicordMessage>('message', async (msg) => {
+  if (msg.attachments.length > 2) {
+    await msg.delete()
+    msg.replyToDM('Too many attachments')
+    // Return 'REJECT' to prevent subsequent layers and
+    // the final event handler from triggering
+    return 'REJECT'
+  }
 })
 ```
 
