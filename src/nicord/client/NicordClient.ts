@@ -1,4 +1,4 @@
-import { Client, Intents, PartialTypes } from 'discord.js'
+import { Client, Intents } from 'discord.js'
 import { IntentsFlags } from './IntentsFlags'
 import { NicordClientException } from '../../exceptions/NicordClient.exception'
 import { CommandListener } from '../../types/CommandListener'
@@ -6,7 +6,7 @@ import { NicordTools } from '../../utils/NicordTools'
 import {
   NicordMiddleware,
   NicordMiddlewareFunction,
-  NicordMiddlewareParmas,
+  NicordMiddlewareReturnType,
   NicordMiddlewareType,
 } from '../../types/NicordMiddleware'
 import { NicordMessage } from '../NicordMessage'
@@ -18,7 +18,7 @@ import { NicordCommandInteraction } from '../interaction/NicordCommandInteractio
 import { NicordButtonInteraction } from '../interaction/NicordButtonInteraction'
 import { NicordPresence } from '../presence/NicordPresence'
 import { ChannelProxy } from '../ChannelProxy'
-import { initializeApp, App } from 'firebase-admin/app'
+import { App, initializeApp } from 'firebase-admin/app'
 import admin from 'firebase-admin'
 import { Firestore, getFirestore } from 'firebase-admin/firestore'
 
@@ -169,9 +169,9 @@ export class NicordClient extends Client {
     }
   }
 
-  useMiddleware(
+  useMiddleware<T>(
     type: NicordMiddlewareType,
-    middleware: NicordMiddlewareFunction,
+    middleware: NicordMiddlewareFunction<T>,
   ) {
     this.middlewares.push({
       type,
@@ -199,7 +199,13 @@ export class NicordClient extends Client {
   private setupEventListeners(): void {
     this.on('messageCreate', async message => {
       let msg = NicordMessage.from(message)
-      msg = (await this.runMiddlewares('message', msg)) as NicordMessage
+
+      try {
+        msg = (await this.runMiddlewares('message', msg)) as NicordMessage
+      } catch (e) {
+        return
+      }
+
       if (msg.author.id !== this.user?.id) {
         for (const listener of this.commandListeners) {
           if (!NicordTools.isSlashListener(listener)) {
@@ -211,10 +217,14 @@ export class NicordClient extends Client {
     this.on('interactionCreate', async interaction => {
       if (interaction.isCommand()) {
         let cmd = NicordCommandInteraction.from(interaction)
-        cmd = (await this.runMiddlewares(
-          'command',
-          cmd,
-        )) as NicordCommandInteraction
+        try {
+          cmd = (await this.runMiddlewares(
+            'command',
+            cmd,
+          )) as NicordCommandInteraction
+        } catch (e) {
+          return
+        }
         for (const listener of this.commandListeners) {
           if (NicordTools.isSlashListener(listener)) {
             await CommandPipeline.slashCommand(cmd, listener)
@@ -231,13 +241,15 @@ export class NicordClient extends Client {
     })
   }
 
-  private async runMiddlewares(
+  private async runMiddlewares<T>(
     type: NicordMiddlewareType,
-    value: NicordMiddlewareParmas,
-  ): Promise<NicordMiddlewareParmas> {
+    value: T,
+  ): Promise<NicordMiddlewareReturnType<T>> {
     for (const mw of this.middlewares) {
       if (mw.type === type) {
-        value = await mw.middleware(value)
+        const runResult = await mw.middleware(value)
+        if (runResult === 'REJECT') throw new Error('Middleware rejected')
+        if (runResult) value = runResult
       }
     }
     return value
