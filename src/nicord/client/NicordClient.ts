@@ -1,20 +1,12 @@
-import { Client, Intents } from 'discord.js'
+import { Awaitable, Client, ClientEvents, Intents } from 'discord.js'
 import { IntentsFlags } from './IntentsFlags'
 import { NicordClientException } from '../../exceptions/NicordClient.exception'
 import { CommandListener } from '../../types/CommandListener'
 import { NicordTools } from '../../utils/NicordTools'
-import {
-  NicordMiddleware,
-  NicordMiddlewareFunction,
-  NicordMiddlewareReturnType,
-  NicordMiddlewareType,
-} from '../../types/NicordMiddleware'
-import { NicordMessage } from '../NicordMessage'
 import { CommandPipeline } from '../command/CommandPipeline'
 import { REST } from '@discordjs/rest'
 import { SlashCommandAutoBuilder } from '../command/SlashCommandAutoBuilder'
 import { Routes } from 'discord-api-types/v9'
-import { NicordCommandInteraction } from '../interaction/NicordCommandInteraction'
 import { NicordButtonInteraction } from '../interaction/NicordButtonInteraction'
 import { NicordPresence } from '../presence/NicordPresence'
 import { ChannelProxy } from '../ChannelProxy'
@@ -22,6 +14,7 @@ import { App, initializeApp } from 'firebase-admin/app'
 import admin from 'firebase-admin'
 import { Firestore, getFirestore } from 'firebase-admin/firestore'
 import * as chalk from 'chalk'
+import { NicordClientEvents } from './NicordClientEvents'
 
 export type ButtonOnclickType = (
   interaction: NicordButtonInteraction,
@@ -36,7 +29,6 @@ export class NicordClient extends Client {
   private nToken: string | undefined
   private started: boolean = false
   private commandListeners: CommandListener[] = []
-  private middlewares: NicordMiddleware[] = []
   private nrest: REST = new REST({ version: '9' })
   private slashCommands: any = []
   private activeButtons: {
@@ -189,15 +181,6 @@ export class NicordClient extends Client {
     }
   }
 
-  useMiddleware<T>(
-    type: NicordMiddlewareType,
-    middleware: NicordMiddlewareFunction<T>,
-  ) {
-    this.middlewares.push({
-      type,
-      middleware,
-    })
-  }
 
   registerButton(id: string, onClick: ButtonOnclickType): void {
     if (!this.activeButtons.find(v => v.id === id))
@@ -217,15 +200,7 @@ export class NicordClient extends Client {
   }
 
   private setupEventListeners(): void {
-    this.on('messageCreate', async message => {
-      let msg = NicordMessage.from(message)
-
-      try {
-        msg = (await this.runMiddlewares('message', msg)) as NicordMessage
-      } catch (e) {
-        return
-      }
-
+    this.nion('messageCreate', async msg => {
       if (msg.author.id !== this.user?.id) {
         for (const listener of this.commandListeners) {
           if (!NicordTools.isSlashListener(listener)) {
@@ -234,52 +209,24 @@ export class NicordClient extends Client {
         }
       }
     })
-    this.on('interactionCreate', async interaction => {
+    this.nionce('interactionCreate', async interaction => {
       if (interaction.isCommand()) {
-        let cmd = NicordCommandInteraction.from(interaction)
-        try {
-          cmd = (await this.runMiddlewares(
-            'command',
-            cmd,
-          )) as NicordCommandInteraction
-        } catch (e) {
-          return
-        }
         for (const listener of this.commandListeners) {
           if (NicordTools.isSlashListener(listener)) {
-            await CommandPipeline.slashCommand(cmd, listener)
+            await CommandPipeline.slashCommand(interaction, listener)
           }
         }
       } else if (interaction.isButton()) {
-        const id = interaction.customId
+        const id = interaction.original.customId
         const onClick = this.activeButtons.find(v => v.id === id)?.onClick
         if (onClick)
-          onClick(NicordButtonInteraction.from(interaction), () => {
+          onClick(interaction, () => {
             this.activeButtons = this.activeButtons.filter(v => v.id !== id)
           })
       }
     })
   }
 
-  private async runMiddlewares<T>(
-    type: NicordMiddlewareType,
-    value: T,
-  ): Promise<NicordMiddlewareReturnType<T>> {
-    for (const mw of this.middlewares) {
-      if (mw.type === type) {
-        try {
-          const runResult = await mw.middleware(value)
-          if (runResult === 'REJECT') throw new Error('Middleware rejected')
-          if (runResult) value = runResult
-        } catch (e) {
-          this.log(
-            chalk.yellow + `One of middlewares throw an exception: \n${e}`,
-          )
-        }
-      }
-    }
-    return value
-  }
 
   private invalidCommandListenerException() {
     return new NicordClientException(
@@ -302,11 +249,33 @@ export class NicordClient extends Client {
     return this.firebaseApp
   }
 
-  getFirestore(): Firestore | undefined {
+  getFirestore(): Firestore {
     if (this.firestore) return this.firestore
     else {
       this.firestore = getFirestore(this.getFirebase())
+      if (!this.firestore) {
+        this.log(chalk.red.bold('Firebase required!'))
+        this.log(chalk.yellow('Part of your application requires Firebase, the configuration of which has not been provided.'))
+        process.kill(process.pid, 'SIGINT')
+      }
       return this.firestore
     }
   }
+
+  nion<K extends keyof NicordClientEvents>(event: K, listener: (...args: NicordClientEvents[K]) => Awaitable<void>): () => void {
+    const l = NicordTools.wrapEventListener(listener)
+    super.on(event, l)
+    return () => {
+      super.off(event, l)
+    }
+  }
+
+  nionce<K extends keyof NicordClientEvents>(event: K, listener: (...args: NicordClientEvents[K]) => Awaitable<void>): () => void {
+    const l = NicordTools.wrapEventListener(listener)
+    super.once(event, l)
+    return () => {
+      super.off(event, l)
+    }
+  }
+
 }

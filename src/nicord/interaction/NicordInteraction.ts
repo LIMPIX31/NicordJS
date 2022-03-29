@@ -1,10 +1,13 @@
 import { Guild, GuildMember, Interaction, User } from 'discord.js'
 import { OriginalShadow } from '../../utils/OriginalShadow'
 import { APIInteractionGuildMember } from 'discord-api-types/v9'
+import { NicordCommandInteraction } from './NicordCommandInteraction'
+import { NicordButtonInteraction } from './NicordButtonInteraction'
+import { NicordContextMenuInteraction } from './NicordContextMenuInteraction'
+import { NicordSelectMenuInteraction } from './NicordSelectMenuInteraction'
 
-export abstract class NicordInteraction<
-  T extends Interaction,
-> extends OriginalShadow<T> {
+export class NicordInteraction<T extends Interaction,
+  > extends OriginalShadow<T> {
   get user(): User {
     return this.original.user
   }
@@ -20,23 +23,28 @@ export abstract class NicordInteraction<
     return this.original.guild
   }
 
-  get isCommand(): boolean {
+  isCommand(): this is NicordCommandInteraction {
     return this.original.isCommand()
   }
 
-  get isButton(): boolean {
+  isButton(): this is NicordButtonInteraction {
     return this.original.isButton()
   }
 
-  get isContextMenu(): boolean {
+  isContextMenu(): this is NicordContextMenuInteraction {
     return this.original.isContextMenu()
   }
 
-  get isSelectMenu(): boolean {
-    return this.original.isContextMenu()
+  isSelectMenu(): this is NicordSelectMenuInteraction {
+    return this.original.isSelectMenu()
   }
 
   get inGuild(): boolean {
     return this.original.inGuild()
   }
+
+  static from(interaction: Interaction) {
+    return new NicordInteraction(interaction)
+  }
+
 }
