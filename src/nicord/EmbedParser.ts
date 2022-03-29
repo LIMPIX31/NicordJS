@@ -1,4 +1,4 @@
-import { MessageEmbedOptions } from 'discord.js'
+import { MessageEmbed, MessageEmbedOptions } from 'discord.js'
 import { EmbedParseException } from '../exceptions/EmbedParse.exception'
 import * as YAML from 'yaml'
 
@@ -22,7 +22,7 @@ export const parseRelaxedJson = <T = any>(rjson?: string): T => {
   }
 }
 
-export const EmbedParser = (input: EmbedLike): MessageEmbedOptions[] => {
+export const EmbedParser = (input: EmbedLike): MessageEmbed[] => {
   const rawEmbeds = Array.from(input.matchAll(embedFindRegexp)).map(v => [
     v.groups?.format,
     v.groups?.code,
@@ -39,5 +39,5 @@ export const EmbedParser = (input: EmbedLike): MessageEmbedOptions[] => {
       }
     }
   }
-  return embedOptions
+  return embedOptions.map(v => new MessageEmbed(v))
 }
