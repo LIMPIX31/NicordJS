@@ -7,7 +7,7 @@ export const packageJson = `{
     "start": "ts-node src/index.ts"
   },
   "dependencies": {
-    "nicord.js": "^1.1.2",
+    "nicord.js": "~%NJSV%",
     "typescript": "^4.5.5"
   },
   "devDependencies": {

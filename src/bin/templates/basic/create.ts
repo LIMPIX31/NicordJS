@@ -7,6 +7,8 @@ import { commandsFile } from './files/commands.ts'
 import { tsconfig } from './files/tsconfig.json'
 import * as chalk from 'chalk'
 
+const { version } = require('../../../../package.json')
+
 export const CreateBasicTemplate = async (
   project: string,
   token: string,
@@ -19,6 +21,7 @@ export const CreateBasicTemplate = async (
   }
   await fs.mkdir(workdir)
   const packageJsonGenerated = packageJson.replaceAll('%PROJECT_NAME%', project)
+    .replaceAll('%NJSV%', version)
   const indexGenerated = indexFile
     .replaceAll('%TOKEN%', token)
     .replaceAll(

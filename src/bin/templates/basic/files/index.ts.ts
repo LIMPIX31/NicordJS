@@ -6,10 +6,10 @@ const client = new NicordClient([
   IntentsFlags.GUILD_MESSAGES,
 ])
 
+client.debug()
+
 client.setToken('%TOKEN%')
 %GUILD_CODE%
-client.start(() => {
-  console.log('Bot started!')
-})
+client.start()
 
 client.addCommandListener(MyCommands)`

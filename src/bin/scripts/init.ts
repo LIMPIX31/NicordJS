@@ -1,7 +1,7 @@
 import * as inquirer from 'inquirer'
 import * as chalk from 'chalk'
 import { CreateBasicTemplate } from '../templates/basic/create'
-import { exec } from 'child_process'
+import * as execa from 'execa'
 
 import { CliStage } from 'cli-stage'
 import * as fs from 'fs'
@@ -22,7 +22,7 @@ const qs = [
     name: 'project',
     type: 'input',
     message: 'Project name:',
-    validate: function (input) {
+    validate: function(input) {
       if (/^([a-z\-_\d])+$/.test(input)) {
         if (!fs.existsSync(path.join(process.cwd(), input))) return true
         else return 'Project already exists'
@@ -34,7 +34,7 @@ const qs = [
     name: 'token',
     type: 'input',
     message: 'Bot token:',
-    validate: function (input) {
+    validate: function(input) {
       if (/^\w+\.\w+\.\w+$/.test(input)) return true
       else return 'Invalid token'
     },
@@ -99,35 +99,38 @@ export const initProject = async () => {
     case Template.ENTERPRISE:
       console.log(
         chalk.red(
-          "'Enterprise' template is in development. Please use another template",
+          '\'Enterprise\' template is in development. Please use another template',
         ),
       )
       return
   }
 
-  const installDeps = () => {
+  const installDeps = async () => {
     if (answers['packman'] === Packman.YARN) {
-      exec('yarn', { cwd: workdir }, err => {
-        if (err) {
-          cls.error(true)
-          process.exit(0)
-        } else cls.success()
-      })
+      try {
+        await execa('yarn', { cwd: workdir })
+        cls.success()
+      } catch (e) {
+        cls.error(true)
+        process.exit(0)
+      }
     } else {
-      exec('npm i', { cwd: workdir }, err => {
-        if (err) {
-          cls.error(true)
-          process.exit(0)
-        } else cls.success()
-      })
+      try {
+        await execa('npm', ['i'], { cwd: workdir })
+        cls.success()
+      } catch (e) {
+        cls.error(true)
+        process.exit(0)
+      }
     }
   }
   if (answers['packman'] === Packman.YARN)
-    exec('npm i yarn -g', { cwd: workdir }, err => {
-      if (err) {
-        cls.error(true)
-        process.exit(0)
-      } else installDeps()
-    })
-  else installDeps()
+    try {
+      await execa('npm', ['i', 'yarn', '-g'], { cwd: workdir })
+      await installDeps()
+    } catch (e) {
+      cls.error(true)
+      process.exit(0)
+    }
+  else await installDeps()
 }
