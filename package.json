@@ -59,6 +59,7 @@
     "firebase": "^9.6.9",
     "firebase-admin": "^10.0.2",
     "inquirer": "^8.2.0",
+    "lodash": "^4.17.21",
     "reflect-metadata": "^0.1.13",
     "yaml": "^1.10.2"
   }
