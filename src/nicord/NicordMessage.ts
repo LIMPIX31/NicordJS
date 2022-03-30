@@ -139,7 +139,7 @@ export class NicordMessage extends OriginalShadow<Message> {
   }
 
   copyOptions(handleEmbeds: boolean = false): MessageOptions {
-    return NicordTools.pipeMessage(this.original, handleEmbeds)
+    return NicordTools.pipeMessage(this.original.client, this.original, handleEmbeds)
   }
 
   get channelId(): string {

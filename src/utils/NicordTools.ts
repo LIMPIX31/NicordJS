@@ -2,7 +2,7 @@ import { CommandListener } from '../types/CommandListener'
 import 'reflect-metadata'
 import { MetadataKeys } from './MetadataKeys'
 import {
-  Awaitable,
+  Awaitable, Client,
   ClientEvents,
   Collection,
   Interaction,
@@ -57,15 +57,18 @@ export abstract class NicordTools {
     )
   }
 
-  static pipeMessage(message: Message, handleEmbeds: boolean = false): MessageOptions {
+  static pipeMessage(client: Client, message: Message, handleEmbeds: boolean = false): MessageOptions {
     const pipedMessage: MessageOptions = {}
-    let embedParseResult: EmbedParserResult = { embeds: [], clearMessage: message.content }
+    let embedParseResult: EmbedParserResult = {
+      embeds: [],
+      clearMessage: message.content,
+    }
     try {
       embedParseResult = EmbedParser(message.content)
     } catch (e) {
       handleEmbeds = false
     }
-    if (embedParseResult.clearMessage.length > 0) pipedMessage.content = embedParseResult.clearMessage
+    if (embedParseResult.clearMessage.length > 0) pipedMessage.content = NicordTools.transpileEmojis(client, embedParseResult.clearMessage)
     if (message.embeds.length > 0 && !handleEmbeds) pipedMessage.embeds = message.embeds
     if (message.components.length > 0)
       pipedMessage.components = message.components
@@ -115,6 +118,15 @@ export abstract class NicordTools {
       }
       listener(...NicordTools.handleDJSEventArgs(...args) as NicordClientEvents[K])
     }
+  }
+
+  static transpileEmojis(client: Client, emojiString: string): string {
+    return emojiString.replaceAll(/(:(?<name>\w+?):|\$?(?<animated>a?):(?<nameid>\w+?):(?<id>\d+?)\$)/g, (match, b, c, d, e, f, g, h, groups) => {
+      const guildEmoji = client.emojis.cache.find(e => e.name === groups.name)
+      if (guildEmoji) return `<${guildEmoji.animated ? 'a' : ''}:${guildEmoji.name}:${guildEmoji.id}>`
+      else if (groups.id) return `<${groups.animated ? 'a' : ''}:${groups.nameid}:${groups.id}>`
+      else return match
+    })
   }
 
 }

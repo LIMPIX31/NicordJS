@@ -286,17 +286,10 @@ export class NicordClient extends Client {
 
   /**
    * Transpiles emoji like :Hyper_Blob: to `<a:Hyper_Blob:853516137047261205>`
-   * @param emojiString - is a string like `:EmojiID:` or string contain that
+   * @param emojiString - is a string like `:EmojiName:` `$EmojiID$` or string contain that
    */
   transpileEmoji(emojiString: string): string {
-    const rawEmojis = emojiString.match(/:\w+?:/g) ?? []
-    const transpiled = rawEmojis.map(v => {
-      const guildEmoji = this.emojis.cache.find(e => e.name === v.replaceAll(':', ''))
-      if (guildEmoji) return `<${guildEmoji.animated ? 'a' : ''}:${guildEmoji.name}:${guildEmoji.id}>`
-    })
-    for (let i = 0; i < rawEmojis.length; i++)
-      if (transpiled[i]) emojiString = emojiString.replaceAll(rawEmojis[i], transpiled[i] ?? '')
-    return emojiString
+    return NicordTools.transpileEmojis(this, emojiString)
   }
 
   useMiddleware<K extends keyof NicordClientEvents>(event: K, listener: (...args: NicordClientEvents[K]) => Awaitable<void | 'REJECT'>) {
