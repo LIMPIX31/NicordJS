@@ -82,21 +82,21 @@ export abstract class NicordTools {
   }
 
   static handleDJSEventArgs(...args: any[]): any[] {
-    for (let arg of args) {
-      arg instanceof Message && (arg = NicordMessage.from(arg))
-      if (arg instanceof Interaction) {
-        if (arg.isCommand()) {
-          arg = NicordCommandInteraction.from(arg)
-        } else if (arg.isButton()) {
-          arg = NicordButtonInteraction.from(arg)
-        } else if (arg.isCommand()) {
-          arg = NicordCommandInteraction.from(arg)
-        } else if (arg.isSelectMenu()) {
-          arg = NicordSelectMenuInteraction.from(arg)
-        } else if (arg.isContextMenu()) {
-          arg = NicordContextMenuInteraction.from(arg)
+    for (let i = 0; i < args.length; i++) {
+      args[i] instanceof Message && (args[i] = NicordMessage.from(args[i]))
+      if (args[i] instanceof Interaction) {
+        if (args[i].isCommand()) {
+          args[i] = NicordCommandInteraction.from(args[i])
+        } else if (args[i].isButton()) {
+          args[i] = NicordButtonInteraction.from(args[i])
+        } else if (args[i].isCommand()) {
+          args[i] = NicordCommandInteraction.from(args[i])
+        } else if (args[i].isSelectMenu()) {
+          args[i] = NicordSelectMenuInteraction.from(args[i])
+        } else if (args[i].isContextMenu()) {
+          args[i] = NicordContextMenuInteraction.from(args[i])
         } else {
-          arg = NicordInteraction.from(arg)
+          args[i] = NicordInteraction.from(args[i])
         }
       }
     }

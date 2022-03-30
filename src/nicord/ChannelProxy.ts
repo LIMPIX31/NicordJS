@@ -62,23 +62,23 @@ export class ChannelProxy {
    */
   bindClient(client: NicordClient) {
     this.client = client
-    client.on('messageCreate', async e => {
+    client.nion('messageCreate', async e => {
       try {
         if (e.author.bot) return
         const capture = await this.getCaptureChannel()
         const destination = await this.getDestinationChannel()
         if (e.channelId === destination.id && this.options.webhookingToCaptureChannel) {
           const webhook = await this.getWebhook(e.author, capture)
-          const wmessage = await webhook.send(NicordTools.pipeMessage(e))
+          const wmessage = await webhook.send(e.copyOptions(this.options.handleEmbeds))
           await this.addCom(e.id, wmessage.id, 'webhook')
         }
         if (e.channelId === capture.id) {
           if (this.options.bot) {
-            const bmessage = await destination.send(NicordTools.pipeMessage(e, this.options.handleEmbeds))
+            const bmessage = await destination.send(e.copyOptions(this.options.handleEmbeds))
             await this.addCom(e.id, bmessage.id, 'bot')
           } else {
             const webhook = await this.getWebhook(e.author, destination)
-            const wmessage = await webhook.send(NicordTools.pipeMessage(e, this.options.handleEmbeds))
+            const wmessage = await webhook.send(e.copyOptions(this.options.handleEmbeds))
             await this.addCom(e.id, wmessage.id, 'webhook')
           }
         }
@@ -86,7 +86,7 @@ export class ChannelProxy {
         this.broadcastProxyChannelError(e.message)
       }
     })
-    client.on('messageUpdate', async (_, e) => {
+    client.nion('messageUpdate', async (_, e) => {
       try {
         if (e.partial) e = await e.fetch()
         if (e.author?.bot) return
@@ -97,10 +97,10 @@ export class ChannelProxy {
           if (comid) {
             if (comtype === 'bot') {
               const bmessage = await destination.messages.fetch(comid)
-              await bmessage.edit(NicordTools.pipeMessage(e, this.options.handleEmbeds))
+              await bmessage.edit(e.copyOptions(this.options.handleEmbeds))
             } else {
               const webhook = await this.getWebhook(e.author, destination)
-              await webhook.editMessage(comid, NicordTools.pipeMessage(e, this.options.handleEmbeds))
+              await webhook.editMessage(comid, e.copyOptions(this.options.handleEmbeds))
             }
           }
         }
@@ -109,14 +109,14 @@ export class ChannelProxy {
           const cid = await this.getCom(e.id).then(v => v[0])
           if (cid) await webhook.editMessage(
             cid,
-            NicordTools.pipeMessage(e),
+            e.copyOptions(this.options.handleEmbeds),
           )
         }
       } catch (e: any) {
         this.broadcastProxyChannelError(e.message)
       }
     })
-    client.on('messageDelete', async e => {
+    client.nion('messageDelete', async e => {
       try {
         if (e.partial) e = await e.fetch()
         if (e.author?.bot) return

@@ -9,7 +9,7 @@ import {
   Message,
   MessageActionRow,
   MessageAttachment,
-  MessageEmbed,
+  MessageEmbed, MessageOptions,
   MessagePayload,
   MessageReaction,
   ReplyMessageOptions,
@@ -17,6 +17,7 @@ import {
   User,
 } from 'discord.js'
 import { OriginalShadow } from '../utils/OriginalShadow'
+import { NicordTools } from '../utils/NicordTools'
 
 export class NicordMessage extends OriginalShadow<Message> {
   get author(): User {
@@ -114,8 +115,8 @@ export class NicordMessage extends OriginalShadow<Message> {
     return new NicordMessage(await this.original.reactions.removeAll())
   }
 
-  async fetch() {
-    await this.original.fetch()
+  async fetch(): Promise<NicordMessage> {
+    return new NicordMessage(await this.original.fetch())
   }
 
   async getReactions(): Promise<MessageReaction[]> {
@@ -126,4 +127,26 @@ export class NicordMessage extends OriginalShadow<Message> {
   async crosspost(): Promise<NicordMessage> {
     return new NicordMessage(await this.original.crosspost())
   }
+
+  hasEmoji(exact: boolean = false): boolean {
+    const regexp = exact ? /<a?:\w+?:\d+?>/g : /(<a?:\w+?:\d+?>|:\w+?:)/g
+    return this.content.match(regexp) !== null
+  }
+
+  copyOptions(handleEmbeds: boolean = false): MessageOptions {
+    return NicordTools.pipeMessage(this.original, handleEmbeds)
+  }
+
+  get channelId(): string {
+    return this.original.channelId
+  }
+
+  get id(): string {
+    return this.original.id
+  }
+
+  get partial(): boolean {
+    return this.original.partial
+  }
+
 }
