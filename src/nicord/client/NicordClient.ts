@@ -1,8 +1,8 @@
-import { Awaitable, Client, ClientEvents, Intents } from 'discord.js'
+import { Awaitable, Client, Intents } from 'discord.js'
 import { IntentsFlags } from './IntentsFlags'
 import { NicordClientException } from '../../exceptions/NicordClient.exception'
 import { CommandListener } from '../../types/CommandListener'
-import { NicordTools } from '../../utils/NicordTools'
+import { LogLevel, NicordTools } from '../../utils/NicordTools'
 import { CommandPipeline } from '../command/CommandPipeline'
 import { REST } from '@discordjs/rest'
 import { SlashCommandAutoBuilder } from '../command/SlashCommandAutoBuilder'
@@ -26,7 +26,7 @@ export type ButtonOnclickType = (
  * And don't forget {@link IntentsFlags.GUILD_MESSAGES} to respond to participants' messages
  */
 export class NicordClient extends Client {
-  private nToken: string | undefined
+  private nToken?: string
   private started: boolean = false
   private commandListeners: CommandListener[] = []
   private nrest: REST = new REST({ version: '9' })
@@ -35,16 +35,17 @@ export class NicordClient extends Client {
     id: string
     onClick: ButtonOnclickType
   }[] = []
-  private defaultGuildId: string | undefined
+  private defaultGuildId?: string
   private localCommands: boolean = false
   private npresence: NicordPresence = new NicordPresence()
   private firebaseApp?: App
   private firestore?: Firestore
   private _debug: boolean = false
   private middlewares: Record<string, ((...args: any) => Awaitable<void | 'REJECT'>)[]> = {}
+  private loglevel?: LogLevel
 
   constructor(
-    flags: IntentsFlags[] = [IntentsFlags.GUILDS, IntentsFlags.GUILD_MESSAGES],
+    private flags: IntentsFlags[] = [IntentsFlags.GUILDS, IntentsFlags.GUILD_MESSAGES],
   ) {
     super({
       intents: flags.includes(IntentsFlags.ALL)
@@ -63,17 +64,13 @@ export class NicordClient extends Client {
 
   private _clientId: string | undefined
 
-  debug() {
+  debug(level: LogLevel = LogLevel.EXTRA) {
+    this.loglevel = level
     this._debug = true
   }
 
-  log(message: string) {
-    if (this._debug)
-      message
-        .split('\n')
-        .forEach(m =>
-          console.log(chalk.blue.bold('NICORDJS') + chalk.reset(` ${m}`)),
-        )
+  log(level: LogLevel, message: string) {
+    NicordTools.log(this._debug, level, message, this.loglevel ?? LogLevel.EXTRA)
   }
 
   get clientId(): string | undefined {
@@ -120,39 +117,48 @@ export class NicordClient extends Client {
   }
 
   async start(onReady?: () => void): Promise<void> {
+    console.log(NicordTools.getCredits())
+    if (this.flags.includes(IntentsFlags.ALL)) this.log(LogLevel.WARN, 'Dangerous permission "ALL".\nIf you are using the bot in production,\nwe recommend that you restrict permissions and\nstop using IntentFlags.ALL, as this can create vulnerabilities.\nIf you are developing and testing your bot,\nyou can ignore this message.')
     if (this.hasToken) {
-      await this.login(this.nToken)
-      this._clientId = this?.application?.id
-      this.setupEventListeners()
-      if (this.localCommands && this.defaultGuildId) {
-        await this.nrest.put(
-          Routes.applicationGuildCommands(
-            this?.application?.id || this?._clientId || '',
-            this.defaultGuildId,
-          ),
-          {
-            body: this.slashCommands,
-          },
-        )
-      } else {
-        await this.nrest.put(
-          Routes.applicationCommands(this?.application?.id || this?._clientId || ''),
-          {
-            body: this.slashCommands,
-          },
-        )
+      try {
+        await this.login(this.nToken)
+        this.log(LogLevel.EXTRA, 'Logged in successful')
+        this._clientId = this?.application?.id
+        this.log(LogLevel.EXTRA, 'Setting up event listeners')
+        this.setupEventListeners()
+        this.log(LogLevel.EXTRA, 'Setting up slash commands')
+        if (this.localCommands && this.defaultGuildId) {
+          await this.nrest.put(
+            Routes.applicationGuildCommands(
+              this?.application?.id || this?._clientId || '',
+              this.defaultGuildId,
+            ),
+            {
+              body: this.slashCommands,
+            },
+          )
+        } else {
+          await this.nrest.put(
+            Routes.applicationCommands(this?.application?.id || this?._clientId || ''),
+            {
+              body: this.slashCommands,
+            },
+          )
+        }
+        this.started = true
+        process.on('SIGINT', () => {
+          this.log(LogLevel.INFO, chalk.red('Shutting down client'))
+          process.exit(0)
+        })
+        process.on('SIGTERM', () => {
+          this.log(LogLevel.INFO, chalk.red('Shutting down client'))
+          process.exit(0)
+        })
+        this.log(LogLevel.INFO, chalk.green('Client started'))
+        onReady && onReady()
+      } catch (e) {
+        this.log(LogLevel.ERROR, 'Failed to start client')
       }
-      this.started = true
-      process.on('SIGINT', () => {
-        this.log(chalk.red('Shutting down client'))
-        process.exit(0)
-      })
-      process.on('SIGTERM', () => {
-        this.log(chalk.red('Shutting down client'))
-        process.exit(0)
-      })
-      this.log(chalk.green('Client started'))
-      onReady && onReady()
     } else {
       throw new NicordClientException(
         'You need to assign a token before running the client',
@@ -161,6 +167,7 @@ export class NicordClient extends Client {
   }
 
   addCommandListener(Listener: CommandListener) {
+    this.log(LogLevel.EXTRA, `Added new command listener: ${Listener.name}`)
     if (!NicordTools.isCommandListener(Listener))
       throw this.invalidCommandListenerException()
     this.commandListeners.push(Listener)
@@ -172,6 +179,7 @@ export class NicordClient extends Client {
   }
 
   removeCommandListener(Listener: CommandListener) {
+    this.log(LogLevel.EXTRA, `Removed command listener: ${Listener.name}`)
     if (NicordTools.isCommandListener(Listener)) {
       this.commandListeners = this.commandListeners.filter(l => l !== Listener)
     } else {
@@ -189,6 +197,7 @@ export class NicordClient extends Client {
 
 
   registerButton(id: string, onClick: ButtonOnclickType): void {
+    this.log(LogLevel.EXTRA, `Registered button with id: ${id}`)
     if (!this.activeButtons.find(v => v.id === id))
       this.activeButtons.push({ id, onClick })
     else throw new NicordClientException(`Duplicated button id: ${id}`)
@@ -202,6 +211,7 @@ export class NicordClient extends Client {
   }
 
   updatePresence(): void {
+    this.log(LogLevel.EXTRA, 'Updating presence')
     this.user?.setPresence(this.npresence._data)
   }
 
@@ -260,8 +270,8 @@ export class NicordClient extends Client {
     else {
       this.firestore = getFirestore(this.getFirebase())
       if (!this.firestore) {
-        this.log(chalk.red.bold('Firebase required!'))
-        this.log(chalk.yellow('Part of your application requires Firebase, the configuration of which has not been provided.'))
+        this.log(LogLevel.ERROR, 'Firebase required!')
+        this.log(LogLevel.ERROR, 'Part of your application requires Firebase, the configuration of which has not been provided.')
         process.kill(process.pid, 'SIGINT')
       }
       return this.firestore

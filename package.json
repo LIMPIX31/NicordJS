@@ -51,6 +51,8 @@
   "dependencies": {
     "@discordjs/rest": "^0.3.0",
     "@discordjs/voice": "^0.8.0",
+    "align-text": "^1.0.2",
+    "center-align": "0.1.3",
     "chalk": "^4.1.2",
     "cli-stage": "^1.0.1",
     "commander": "^9.0.0",
@@ -62,6 +64,7 @@
     "inquirer": "^8.2.0",
     "lodash": "^4.17.21",
     "reflect-metadata": "^0.1.13",
+    "terminal-link": "2.1.1",
     "yaml": "^1.10.2"
   }
 }

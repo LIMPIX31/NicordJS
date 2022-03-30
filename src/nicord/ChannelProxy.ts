@@ -3,7 +3,7 @@ import { Snowflake, TextBasedChannel, TextChannel, User, Webhook } from 'discord
 import { ShadowUser } from './webhook/ShadowUser'
 import { NicordClientException } from '../exceptions/NicordClient.exception'
 import { DocumentData } from 'firebase-admin/firestore'
-import * as chalk from 'chalk'
+import { LogLevel } from '../utils/NicordTools'
 
 const colname = 'idcomparisons'
 
@@ -60,6 +60,7 @@ export class ChannelProxy {
    */
   bindClient(client: NicordClient) {
     this.client = client
+    client.log(LogLevel.EXTRA, 'Initializing proxy')
     client.nion('messageCreate', async e => {
       try {
         if (e.author.bot) return
@@ -180,7 +181,7 @@ export class ChannelProxy {
 
   private broadcastProxyChannelError(message: any) {
     const client = this.getClient()
-    client.log(chalk.gray(`Event from proxy channel [${this.options.captureChannel} -> ${this.options.destinationChannel}] throw exception: ${message}`))
+    client.log(LogLevel.EXTRA, `Event from proxy channel [${this.options.captureChannel} -> ${this.options.destinationChannel}] throw exception: ${message}`)
   }
 
 }
