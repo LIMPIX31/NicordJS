@@ -86,6 +86,16 @@ class SlashCommands {
 client.addCommandListener(SlashCommands)
 ```
 
+## Events
+
+NicordJS replaces the event system with its own for some reason, but it works the same way as before
+```ts
+client.nion('messageCreate', msg => {
+  msg.replyToDM('Hi!')
+})
+client.nionce(/**/)
+```
+
 ## Legacy commands
 
 Ordinary, text commands that begin with the prefix
@@ -189,14 +199,10 @@ client.registerButton('saydm', (interaction) => {
 
 ## Middlewares
 
-Thinking about message logging or filtering unwanted content? Use middlewares
+Intermediate layers are executed one after another before the execution of the listeners of the specified event, they are executed even for events declared inside NicordJS
 
 ```ts
-client.useMiddleware<NicordMessage>('message', (msg) => {
-  console.log(msg.content)
-})
-
-client.useMiddleware<NicordMessage>('message', async (msg) => {
+client.useMiddleware('messageCreate', async (msg) => {
   if (msg.attachments.length > 2) {
     await msg.delete()
     msg.replyToDM('Too many attachments')

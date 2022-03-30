@@ -6,14 +6,15 @@
 
 <p align="center">Современная библиотека для создания дискорд ботов на основе DiscordJS</p>
 
-[English](https://github.com/LIMPIX31/NicordJS#readme) | [Русский](https://github.com/LIMPIX31/NicordJS/blob/master/README.ru.md)
+[English](https://github.com/LIMPIX31/NicordJS#readme)
+| [Русский](https://github.com/LIMPIX31/NicordJS/blob/master/README.ru.md)
 
 ## CLI (Создание готового шаблона)
 
 ```bash
 # установите nicord.js глобально
 npm i nicord.js -g
-# Звпустите эту команду в каталоге ваших проектов
+# Запустите эту команду в каталоге ваших проектов
 # и следуйте инструкциям, чтобы создать проект
 nicord init
 ```
@@ -40,7 +41,7 @@ const client = new NicordClient([
   IntentsFlags.GUILDS,
   IntentsFlags.GUILD_MESSAGES,
 ])
-  
+
 // Включаем логгирование
 client.debug()
 // Устанавливаем токен бота
@@ -90,6 +91,17 @@ class SlashCommands {
 
 client.addCommandListener(SlashCommands)
 ```
+
+## События
+
+NicordJS подменяет систему ивентов на свою по некоторым причинам, но это работает так же как и раньше
+```ts
+client.nion('messageCreate', msg => {
+  msg.replyToDM('Hi!')
+})
+client.nionce(/**/)
+```
+
 
 ## Устаревшие(текстовые) команды
 
@@ -194,14 +206,11 @@ client.registerButton('saydm', (interaction) => {
 
 ## Middlewares
 
-Думаете о чём-то вроде логгирования сообщений или фильтрации нежелательного контента? Используйте middlewares(промежуточные слои)
+Промежуточные слои выполняются друг за другом перед выполнением слушателей указанного события, они выполняются даже для
+событий объявленных внутри NicordJS
 
 ```ts
-client.useMiddleware<NicordMessage>('message', (msg) => {
-  console.log(msg.content)
-})
-
-client.useMiddleware<NicordMessage>('message', async (msg) => {
+client.useMiddleware('messageCreate', async (msg) => {
   if (msg.attachments.length > 2) {
     await msg.delete()
     msg.replyToDM('Too many attachments')
@@ -240,14 +249,17 @@ client.start(() => {
 ```
 
 ## Затенение
-Вы можете создать вебхук в точности повторяющий указанного пользователя, это даёт возможность делать очень интересные вещи.
-Настройте Firebase, чтобы более детально синхронизировать вебхуки и не допустить их дублирования
+
+Вы можете создать вебхук в точности повторяющий указанного пользователя, это даёт возможность делать очень интересные
+вещи. Настройте Firebase, чтобы более детально синхронизировать вебхуки и не допустить их дублирования
+
 ```ts
-const shadowUser = new ShadowUser(client, {user, channel})
+const shadowUser = new ShadowUser(client, { user, channel })
 const webhook = await shadowUser.get()
 ```
 
 ## Пример затенения
+
 Настройте затенение сообщений у вас на сервере, чтобы иметь возможность отправлять встраивания
 
 ```ts
@@ -255,7 +267,7 @@ client.useMiddleware<NicordMessage>('message', async (msg) => {
   const embeds = EmbedParser(msg.content)
   if (embeds.length > 0) {
     await msg.delete()
-    if(!(msg.channel instanceof TextChannel)) return msg
+    if (!(msg.channel instanceof TextChannel)) return msg
     const webhook = await new ShadowUser(client, { user: msg.author, channel: msg.channel }).get()
     await webhook.send({ embeds })
   }
@@ -263,7 +275,8 @@ client.useMiddleware<NicordMessage>('message', async (msg) => {
 ```
 
 ## Проксирование канала
-Вы можете отправлять сообщения от имени вашего бота и транслировать сообщения из других каналов 
+
+Вы можете отправлять сообщения от имени вашего бота и транслировать сообщения из других каналов
 
 ```ts
 // Нам понадобится Firebase. Это не обязательно, но если вы хотите
@@ -296,14 +309,21 @@ const destinationChannel = '786861708487557163'
 client.start(async () => {
   console.log('Bot started!')
   // Создаём и запускаем прокси.
-  client.useProxy(new ChannelProxy(captureChannel, destinationChannel))
+  client.useProxy(new ChannelProxy({
+    captureChannel,
+    destinationChannel,
+    bot: true, // Перенаправлять ли сообщения из captureChannel в destinationChannel от имени бота или вебхука пользователя
+    webhookingToCaptureChannel: true, // // Перенаправлять ли сообщения из destinationChannel в captureChannel от имени вебхука пользователя
+    handleEmbeds: true // Обрабатывать ли встраивания для сообщений отправленных из captureChannel
+  }))
 })
 
 ```
 
 ## Сторонние возможности
 
-Так как `NicordJS` это обёртка над `DiscordJS`, если функциональности `NicordJS` недостаточно, вы можете импортировать классы и типы `DiscordJS` из `NicordJS`, так как `NicordJS` наследует `DiscordJS`.
+Так как `NicordJS` это обёртка над `DiscordJS`, если функциональности `NicordJS` недостаточно, вы можете импортировать
+классы и типы `DiscordJS` из `NicordJS`, так как `NicordJS` наследует `DiscordJS`.
 
 ## Использовано
 
