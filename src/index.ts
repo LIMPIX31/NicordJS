@@ -35,7 +35,6 @@ import { NicordCommandInteraction } from './nicord/interaction/NicordCommandInte
 import { NicordInteraction } from './nicord/interaction/NicordInteraction'
 import { NicordRepliableInteraction } from './nicord/interaction/NicordRepliableInteraction'
 import { CommandListener } from './types/CommandListener'
-import { NicordMiddleware } from './types/NicordMiddleware'
 import { NicordCommandError } from './nicord/NicordCommandError'
 import { NicordPresence } from './nicord/presence/NicordPresence'
 import { NicordActivity } from './nicord/presence/NicordActivity'
@@ -83,7 +82,6 @@ export {
   NicordInteraction,
   NicordRepliableInteraction,
   CommandListener,
-  NicordMiddleware,
   NicordCommandError,
   UseGuard,
   NicordPresence,
