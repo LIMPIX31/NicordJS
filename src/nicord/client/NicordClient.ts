@@ -76,8 +76,8 @@ export class NicordClient extends Client {
         )
   }
 
-  set clientId(clientId: string) {
-    this._clientId = clientId
+  get clientId(): string | undefined {
+    return this._clientId
   }
 
   get isNotStarted(): boolean {
@@ -122,11 +122,12 @@ export class NicordClient extends Client {
   async start(onReady?: () => void): Promise<void> {
     if (this.hasToken) {
       await this.login(this.nToken)
+      this._clientId = this?.application?.id
       this.setupEventListeners()
       if (this.localCommands && this.defaultGuildId) {
         await this.nrest.put(
           Routes.applicationGuildCommands(
-            this?.user?.id || this?._clientId || '',
+            this?.application?.id || this?._clientId || '',
             this.defaultGuildId,
           ),
           {
@@ -135,7 +136,7 @@ export class NicordClient extends Client {
         )
       } else {
         await this.nrest.put(
-          Routes.applicationCommands(this?.user?.id || this?._clientId || ''),
+          Routes.applicationCommands(this?.application?.id || this?._clientId || ''),
           {
             body: this.slashCommands,
           },
@@ -143,6 +144,10 @@ export class NicordClient extends Client {
       }
       this.started = true
       process.on('SIGINT', () => {
+        this.log(chalk.red('Shutting down client'))
+        process.exit(0)
+      })
+      process.on('SIGTERM', () => {
         this.log(chalk.red('Shutting down client'))
         process.exit(0)
       })
