@@ -54,8 +54,9 @@ export class ShadowUser {
             .collection('webhookUsers')
             .where('userId', '==', user.id)
             .where('channelId', '==', channel.id)
+            .where('createdBy', '==', this.client.clientId)
             .get()
-            .then(qs => new Promise<DocumentData>(r => qs.forEach(v => r(v.data()))))
+            .then(qs => new Promise<DocumentData | void>(r => {qs.forEach(v => r(v.data())); r()}))
             .then(res => res?.token)
           const dbFindResult = webhooks.find(w => w.token === token)
           if (dbFindResult) {
@@ -76,6 +77,7 @@ export class ShadowUser {
           userId: user.id,
           token: newWebhook.token,
           channelId: channel.id,
+          createdBy: this.client.clientId,
         })
       this.client.log(
         chalk.gray(`Webhooking [${user.username}#${user.discriminator}/${user.id}] in (${channel.name}/${channel.id})`),

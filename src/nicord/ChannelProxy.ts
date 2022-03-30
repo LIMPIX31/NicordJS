@@ -164,7 +164,10 @@ export class ChannelProxy {
       .collection(colname)
       .where('f', '==', idc)
       .get()
-      .then(qs => new Promise<DocumentData>(r => qs.forEach(v => r(v.data()))))
+      .then(qs => new Promise<DocumentData | void>(r => {
+        qs.forEach(v => r(v.data()))
+        r()
+      }))
       .then(res => [res?.t, res?.type])
   }
 
