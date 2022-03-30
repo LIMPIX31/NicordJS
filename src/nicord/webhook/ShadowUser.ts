@@ -6,6 +6,8 @@ import {
   Webhook,
 } from 'discord.js'
 import { NicordClientException } from '../../exceptions/NicordClient.exception'
+import { DocumentData } from 'firebase-admin/firestore'
+import * as chalk from 'chalk'
 
 const colname = 'webhookUsers'
 
@@ -20,7 +22,8 @@ export class ShadowUser {
   constructor(
     private client: NicordClient,
     private options: ShadowUserOptions,
-  ) {}
+  ) {
+  }
 
   async get(): Promise<Webhook> {
     if (this.webhook) return this.webhook
@@ -52,8 +55,8 @@ export class ShadowUser {
             .where('userId', '==', user.id)
             .where('channelId', '==', channel.id)
             .get()
-            .then(res => res[0])
-            .then(res => res?.data().token)
+            .then(qs => new Promise<DocumentData>(r => qs.forEach(v => r(v.data()))))
+            .then(res => res?.token)
           const dbFindResult = webhooks.find(w => w.token === token)
           if (dbFindResult) {
             if (userAvatar) dbFindResult.avatar = userAvatar
@@ -75,7 +78,7 @@ export class ShadowUser {
           channelId: channel.id,
         })
       this.client.log(
-        `Webhooking [${user.username}#${user.discriminator}/${user.id}] in (${channel.name}/${channel.id})`,
+        chalk.gray(`Webhooking [${user.username}#${user.discriminator}/${user.id}] in (${channel.name}/${channel.id})`),
       )
       return newWebhook
     }

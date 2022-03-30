@@ -7,10 +7,10 @@ import {
   Collection,
   Interaction,
   Message,
-  MessageAttachment,
+  MessageAttachment, MessageEmbed,
   MessageOptions,
 } from 'discord.js'
-import { EmbedParser } from '../nicord/EmbedParser'
+import { EmbedParser, EmbedParserResult } from '../nicord/EmbedParser'
 import { NicordMessage } from '../nicord/NicordMessage'
 import { NicordCommandInteraction } from '../nicord/interaction/NicordCommandInteraction'
 import { NicordButtonInteraction } from '../nicord/interaction/NicordButtonInteraction'
@@ -59,14 +59,19 @@ export abstract class NicordTools {
 
   static pipeMessage(message: Message, handleEmbeds: boolean = false): MessageOptions {
     const pipedMessage: MessageOptions = {}
-    if (message.content.length > 0) pipedMessage.content = message.content
-    if (message.embeds.length > 0) pipedMessage.embeds = message.embeds
+    let embedParseResult: EmbedParserResult = { embeds: [], clearMessage: message.content }
+    try {
+      embedParseResult = EmbedParser(message.content)
+    } catch (e) {
+      handleEmbeds = false
+    }
+    if (embedParseResult.clearMessage.length > 0) pipedMessage.content = embedParseResult.clearMessage
+    if (message.embeds.length > 0 && !handleEmbeds) pipedMessage.embeds = message.embeds
     if (message.components.length > 0)
       pipedMessage.components = message.components
     if (message.attachments.size > 0)
       pipedMessage.files = NicordTools.pipeAttachments(message.attachments)
-    const userEmbeds = EmbedParser(message.content)
-    if (userEmbeds.length > 0 && handleEmbeds) message.embeds.push(...userEmbeds)
+    if (embedParseResult.embeds.length > 0 && handleEmbeds) pipedMessage.embeds = [...(pipedMessage.embeds ?? []), ...embedParseResult.embeds]
     return pipedMessage
   }
 
