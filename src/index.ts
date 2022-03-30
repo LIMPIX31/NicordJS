@@ -41,6 +41,7 @@ import { NicordActivity } from './nicord/presence/NicordActivity'
 import { ChannelProxy } from './nicord/ChannelProxy'
 import { EmbedParser, EmbedParserResult } from './nicord/EmbedParser'
 import { ShadowUser, ShadowUserOptions } from './nicord/webhook/ShadowUser'
+import { LogLevel } from './utils/NicordTools'
 
 export * from 'discord.js'
 export * from '@discordjs/voice'
@@ -91,4 +92,5 @@ export {
   ShadowUserOptions,
   EmbedParser,
   EmbedParserResult,
+  LogLevel
 }
