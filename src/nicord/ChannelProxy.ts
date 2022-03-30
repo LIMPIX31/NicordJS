@@ -1,17 +1,15 @@
 import { NicordClient } from './client/NicordClient'
-import { Snowflake, TextChannel, User, Webhook } from 'discord.js'
+import { Snowflake, TextBasedChannel, TextChannel, User, Webhook } from 'discord.js'
 import { ShadowUser } from './webhook/ShadowUser'
-import { NicordTools } from '../utils/NicordTools'
 import { NicordClientException } from '../exceptions/NicordClient.exception'
-import { firestore } from 'firebase-admin'
 import { DocumentData } from 'firebase-admin/firestore'
 import * as chalk from 'chalk'
 
 const colname = 'idcomparisons'
 
 export type ChannelProxyOptions = {
-  captureChannel: string | TextChannel,
-  destinationChannel: string | TextChannel,
+  captureChannel: string | TextChannel | TextBasedChannel,
+  destinationChannel: string | TextChannel | TextBasedChannel,
   bot?: boolean,
   webhookingToCaptureChannel: boolean,
   handleEmbeds?: boolean
@@ -25,7 +23,7 @@ export class ChannelProxy {
 
   private async getWebhook(
     user: User,
-    channel: TextChannel,
+    channel: TextChannel | TextBasedChannel,
   ): Promise<Webhook> {
     const client = this.getClient()
     return await new ShadowUser(client, { user, channel }).get()

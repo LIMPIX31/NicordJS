@@ -1,6 +1,6 @@
 import { NicordClient } from '../client/NicordClient'
 import {
-  ChannelWebhookCreateOptions,
+  ChannelWebhookCreateOptions, TextBasedChannel,
   TextChannel,
   User,
   Webhook,
@@ -13,7 +13,7 @@ const colname = 'webhookUsers'
 
 export type ShadowUserOptions = {
   user: User | string
-  channel: TextChannel | string
+  channel: TextChannel | TextBasedChannel | string
 }
 
 export class ShadowUser {
