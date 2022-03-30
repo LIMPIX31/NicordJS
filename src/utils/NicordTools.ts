@@ -131,7 +131,7 @@ export abstract class NicordTools {
   }
 
   static transpileEmojis(client: Client, emojiString: string): string {
-    return emojiString.replaceAll(/(:(?<name>\w+?):|\$?(?<animated>a?):(?<nameid>\w+?):(?<id>\d+?)\$)/g, (match, b, c, d, e, f, g, h, groups) => {
+    return emojiString.replaceAll(/((?<!<):((?<name>\w+?):)(?!>)|\$?(?<animated>a?):(?<nameid>\w+?):(?<id>\d+?)\$)/g, (match, b, c, d, e, f, g, h, j, groups) => {
       const guildEmoji = client.emojis.cache.find(e => e.name === groups.name)
       if (guildEmoji) return `<${guildEmoji.animated ? 'a' : ''}:${guildEmoji.name}:${guildEmoji.id}>`
       else if (groups.id) return `<${groups.animated ? 'a' : ''}:${groups.nameid}:${groups.id}>`
