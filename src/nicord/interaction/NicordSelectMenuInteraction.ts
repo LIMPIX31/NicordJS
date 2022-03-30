@@ -1,5 +1,9 @@
 import { NicordRepliableInteraction } from './NicordRepliableInteraction'
-import { ButtonInteraction, ContextMenuInteraction, SelectMenuInteraction } from 'discord.js'
+import {
+  ButtonInteraction,
+  ContextMenuInteraction,
+  SelectMenuInteraction,
+} from 'discord.js'
 
 export class NicordSelectMenuInteraction extends NicordRepliableInteraction<SelectMenuInteraction> {
   static from(interaction: SelectMenuInteraction): NicordSelectMenuInteraction {
@@ -9,5 +13,4 @@ export class NicordSelectMenuInteraction extends NicordRepliableInteraction<Sele
   get values(): string[] {
     return this.original.values
   }
-
 }

@@ -20,7 +20,8 @@ export const CreateBasicTemplate = async (
     throw new Error('Project already exists')
   }
   await fs.mkdir(workdir)
-  const packageJsonGenerated = packageJson.replaceAll('%PROJECT_NAME%', project)
+  const packageJsonGenerated = packageJson
+    .replaceAll('%PROJECT_NAME%', project)
     .replaceAll('%NJSV%', version)
   const indexGenerated = indexFile
     .replaceAll('%TOKEN%', token)

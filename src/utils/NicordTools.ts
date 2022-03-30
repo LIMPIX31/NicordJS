@@ -28,7 +28,10 @@ import * as centerAlign from 'center-align'
 const { version, author } = require('../../package.json')
 
 export enum LogLevel {
-  ERROR = 0, WARN = 1, INFO = 2, EXTRA = 3
+  ERROR = 0,
+  WARN = 1,
+  INFO = 2,
+  EXTRA = 3,
 }
 
 export abstract class NicordTools {
@@ -67,7 +70,11 @@ export abstract class NicordTools {
     )
   }
 
-  static pipeMessage(client: Client, message: Message, handleEmbeds: boolean = false): MessageOptions {
+  static pipeMessage(
+    client: Client,
+    message: Message,
+    handleEmbeds: boolean = false,
+  ): MessageOptions {
     const pipedMessage: MessageOptions = {}
     let embedParseResult: EmbedParserResult = {
       embeds: [],
@@ -78,13 +85,22 @@ export abstract class NicordTools {
     } catch (e) {
       handleEmbeds = false
     }
-    if (embedParseResult.clearMessage.length > 0) pipedMessage.content = NicordTools.transpileEmojis(client, embedParseResult.clearMessage)
-    if (message.embeds.length > 0 && !handleEmbeds) pipedMessage.embeds = message.embeds
+    if (embedParseResult.clearMessage.length > 0)
+      pipedMessage.content = NicordTools.transpileEmojis(
+        client,
+        embedParseResult.clearMessage,
+      )
+    if (message.embeds.length > 0 && !handleEmbeds)
+      pipedMessage.embeds = message.embeds
     if (message.components.length > 0)
       pipedMessage.components = message.components
     if (message.attachments.size > 0)
       pipedMessage.files = NicordTools.pipeAttachments(message.attachments)
-    if (embedParseResult.embeds.length > 0 && handleEmbeds) pipedMessage.embeds = [...(pipedMessage.embeds ?? []), ...embedParseResult.embeds]
+    if (embedParseResult.embeds.length > 0 && handleEmbeds)
+      pipedMessage.embeds = [
+        ...(pipedMessage.embeds ?? []),
+        ...embedParseResult.embeds,
+      ]
     return pipedMessage
   }
 
@@ -116,27 +132,53 @@ export abstract class NicordTools {
     return args
   }
 
-  static wrapEventListener<K extends keyof ClientEvents>(event: K, client: NicordClient, middlewares: ((...args: NicordClientEvents[K]) => Awaitable<void | 'REJECT'>)[], listener: (...args: NicordClientEvents[K]) => Awaitable<void>): (...args: ClientEvents[K]) => Awaitable<void> {
+  static wrapEventListener<K extends keyof ClientEvents>(
+    event: K,
+    client: NicordClient,
+    middlewares: ((
+      ...args: NicordClientEvents[K]
+    ) => Awaitable<void | 'REJECT'>)[],
+    listener: (...args: NicordClientEvents[K]) => Awaitable<void>,
+  ): (...args: ClientEvents[K]) => Awaitable<void> {
     return (...args) => {
       for (const mid of middlewares) {
         try {
-          if (mid(...NicordTools.handleDJSEventArgs(...args) as NicordClientEvents[K]) === 'REJECT') return
+          if (
+            mid(
+              ...(NicordTools.handleDJSEventArgs(
+                ...args,
+              ) as NicordClientEvents[K]),
+            ) === 'REJECT'
+          )
+            return
         } catch (e) {
-          client.log(LogLevel.ERROR, `One of middlewares for ${event} throw an error:\n${e}`)
+          client.log(
+            LogLevel.ERROR,
+            `One of middlewares for ${event} throw an error:\n${e}`,
+          )
           return
         }
       }
-      listener(...NicordTools.handleDJSEventArgs(...args) as NicordClientEvents[K])
+      listener(
+        ...(NicordTools.handleDJSEventArgs(...args) as NicordClientEvents[K]),
+      )
     }
   }
 
   static transpileEmojis(client: Client, emojiString: string): string {
-    return emojiString.replaceAll(/((?<!<):((?<name>\w+?):)(?!>)|\$?(?<animated>a?):(?<nameid>\w+?):(?<id>\d+?)\$)/g, (match, b, c, d, e, f, g, h, j, groups) => {
-      const guildEmoji = client.emojis.cache.find(e => e.name === groups.name)
-      if (guildEmoji) return `<${guildEmoji.animated ? 'a' : ''}:${guildEmoji.name}:${guildEmoji.id}>`
-      else if (groups.id) return `<${groups.animated ? 'a' : ''}:${groups.nameid}:${groups.id}>`
-      else return match
-    })
+    return emojiString.replaceAll(
+      /((?<!<):((?<name>\w+?):)(?!>)|\$?(?<animated>a?):(?<nameid>\w+?):(?<id>\d+?)\$)/g,
+      (match, b, c, d, e, f, g, h, j, groups) => {
+        const guildEmoji = client.emojis.cache.find(e => e.name === groups.name)
+        if (guildEmoji)
+          return `<${guildEmoji.animated ? 'a' : ''}:${guildEmoji.name}:${
+            guildEmoji.id
+          }>`
+        else if (groups.id)
+          return `<${groups.animated ? 'a' : ''}:${groups.nameid}:${groups.id}>`
+        else return match
+      },
+    )
   }
 
   static getHMSMcs(): string {
@@ -148,8 +190,12 @@ export abstract class NicordTools {
     return `${hours}:${minutes}:${seconds}::${milliseconds}`
   }
 
-  static log(enabled: boolean, level: LogLevel, message: any, filterLevel: LogLevel) {
-
+  static log(
+    enabled: boolean,
+    level: LogLevel,
+    message: any,
+    filterLevel: LogLevel,
+  ) {
     if (level > filterLevel || !enabled) return
 
     let colorfn: Chalk
@@ -175,20 +221,33 @@ export abstract class NicordTools {
     message
       .split('\n')
       .forEach(m =>
-        console.log(chalk.gray(`[${NicordTools.getHMSMcs()}] `) + prefix + colorfn(` ${m.toString()}`)),
+        console.log(
+          chalk.gray(`[${NicordTools.getHMSMcs()}] `) +
+            prefix +
+            colorfn(` ${m.toString()}`),
+        ),
       )
   }
 
   static getCredits(): string {
     return centerAlign(`
-                              -={ ${chalk.magentaBright.bold('NicordJS')} ${chalk.blue(version)} }=-
-            Created By ${chalk.yellow(Array.isArray(author) ? author.join(' ') : author)}
+                              -={ ${chalk.magentaBright.bold(
+                                'NicordJS',
+                              )} ${chalk.blue(version)} }=-
+            Created By ${chalk.yellow(
+              Array.isArray(author) ? author.join(' ') : author,
+            )}
             
-            Support me: ${terminalLink(chalk.yellow('DonationAlerts'), 'https://www.donationalerts.com/r/limpix31')}
-            NicordJS support on Discord: ${terminalLink(chalk.yellow('discord.gg/75uYTryUu8'), 'https://discord.gg/75uYTryUu8')}
+            Support me: ${terminalLink(
+              chalk.yellow('DonationAlerts'),
+              'https://www.donationalerts.com/r/limpix31',
+            )}
+            NicordJS support on Discord: ${terminalLink(
+              chalk.yellow('discord.gg/75uYTryUu8'),
+              'https://discord.gg/75uYTryUu8',
+            )}
             
             ${chalk.gray(`© NicordJS 2022 - ${new Date().getFullYear()}`)}
     `)
   }
-
 }

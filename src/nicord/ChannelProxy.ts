@@ -1,5 +1,11 @@
 import { NicordClient } from './client/NicordClient'
-import { Snowflake, TextBasedChannel, TextChannel, User, Webhook } from 'discord.js'
+import {
+  Snowflake,
+  TextBasedChannel,
+  TextChannel,
+  User,
+  Webhook,
+} from 'discord.js'
 import { ShadowUser } from './webhook/ShadowUser'
 import { NicordClientException } from '../exceptions/NicordClient.exception'
 import { DocumentData } from 'firebase-admin/firestore'
@@ -8,18 +14,17 @@ import { LogLevel } from '../utils/NicordTools'
 const colname = 'idcomparisons'
 
 export type ChannelProxyOptions = {
-  captureChannel: string | TextChannel | TextBasedChannel,
-  destinationChannel: string | TextChannel | TextBasedChannel,
-  bot?: boolean,
-  webhookingToCaptureChannel: boolean,
+  captureChannel: string | TextChannel | TextBasedChannel
+  destinationChannel: string | TextChannel | TextBasedChannel
+  bot?: boolean
+  webhookingToCaptureChannel: boolean
   handleEmbeds?: boolean
 }
 
 export class ChannelProxy {
   private client?: NicordClient
 
-  constructor(private options: ChannelProxyOptions) {
-  }
+  constructor(private options: ChannelProxyOptions) {}
 
   private async getWebhook(
     user: User,
@@ -31,9 +36,12 @@ export class ChannelProxy {
 
   private async getDestinationChannel(): Promise<TextChannel> {
     const client = this.getClient()
-    const channel = typeof this.options.destinationChannel === 'string' ?
-      client.channels.cache.find(v => v.id === this.options.destinationChannel) ?? await client.channels.fetch(this.options.destinationChannel)
-      : this.options.destinationChannel
+    const channel =
+      typeof this.options.destinationChannel === 'string'
+        ? client.channels.cache.find(
+            v => v.id === this.options.destinationChannel,
+          ) ?? (await client.channels.fetch(this.options.destinationChannel))
+        : this.options.destinationChannel
     if (!(channel instanceof TextChannel))
       throw new NicordClientException(
         'Proxy destination channel must be existent TextChannel',
@@ -43,9 +51,12 @@ export class ChannelProxy {
 
   private async getCaptureChannel(): Promise<TextChannel> {
     const client = this.getClient()
-    const channel = typeof this.options.captureChannel === 'string' ?
-      client.channels.cache.find(v => v.id === this.options.captureChannel) ?? await client.channels.fetch(this.options.captureChannel)
-      : this.options.captureChannel
+    const channel =
+      typeof this.options.captureChannel === 'string'
+        ? client.channels.cache.find(
+            v => v.id === this.options.captureChannel,
+          ) ?? (await client.channels.fetch(this.options.captureChannel))
+        : this.options.captureChannel
     if (!(channel instanceof TextChannel))
       throw new NicordClientException(
         'Proxy capture channel must be existent TextChannel',
@@ -66,18 +77,27 @@ export class ChannelProxy {
         if (e.author.bot) return
         const capture = await this.getCaptureChannel()
         const destination = await this.getDestinationChannel()
-        if (e.channelId === destination.id && this.options.webhookingToCaptureChannel) {
+        if (
+          e.channelId === destination.id &&
+          this.options.webhookingToCaptureChannel
+        ) {
           const webhook = await this.getWebhook(e.author, capture)
-          const wmessage = await webhook.send(e.copyOptions(this.options.handleEmbeds))
+          const wmessage = await webhook.send(
+            e.copyOptions(this.options.handleEmbeds),
+          )
           await this.addCom(e.id, wmessage.id, 'webhook')
         }
         if (e.channelId === capture.id) {
           if (this.options.bot) {
-            const bmessage = await destination.send(e.copyOptions(this.options.handleEmbeds))
+            const bmessage = await destination.send(
+              e.copyOptions(this.options.handleEmbeds),
+            )
             await this.addCom(e.id, bmessage.id, 'bot')
           } else {
             const webhook = await this.getWebhook(e.author, destination)
-            const wmessage = await webhook.send(e.copyOptions(this.options.handleEmbeds))
+            const wmessage = await webhook.send(
+              e.copyOptions(this.options.handleEmbeds),
+            )
             await this.addCom(e.id, wmessage.id, 'webhook')
           }
         }
@@ -99,17 +119,21 @@ export class ChannelProxy {
               await bmessage.edit(e.copyOptions(this.options.handleEmbeds))
             } else {
               const webhook = await this.getWebhook(e.author, destination)
-              await webhook.editMessage(comid, e.copyOptions(this.options.handleEmbeds))
+              await webhook.editMessage(
+                comid,
+                e.copyOptions(this.options.handleEmbeds),
+              )
             }
           }
         }
         if (e.channelId === destination.id) {
           const webhook = await this.getWebhook(e.author, capture)
           const cid = await this.getCom(e.id).then(v => v[0])
-          if (cid) await webhook.editMessage(
-            cid,
-            e.copyOptions(this.options.handleEmbeds),
-          )
+          if (cid)
+            await webhook.editMessage(
+              cid,
+              e.copyOptions(this.options.handleEmbeds),
+            )
         }
       } catch (e: any) {
         this.broadcastProxyChannelError(e.message)
@@ -147,11 +171,15 @@ export class ChannelProxy {
   }
 
   async addCom(idc: Snowflake, id: Snowflake, type: 'webhook' | 'bot') {
-    await this.getClient().getFirestore().collection(colname).add({ f: idc, t: id, type })
+    await this.getClient()
+      .getFirestore()
+      .collection(colname)
+      .add({ f: idc, t: id, type })
   }
 
   private async removeCom(idc: Snowflake) {
-    await this.getClient().getFirestore()
+    await this.getClient()
+      .getFirestore()
       .collection(colname)
       .where('f', '==', idc)
       .get()
@@ -160,15 +188,21 @@ export class ChannelProxy {
       })
   }
 
-  private async getCom(idc: Snowflake): Promise<[Snowflake, 'bot' | 'webhook']> {
-    return this.getClient().getFirestore()
+  private async getCom(
+    idc: Snowflake,
+  ): Promise<[Snowflake, 'bot' | 'webhook']> {
+    return this.getClient()
+      .getFirestore()
       .collection(colname)
       .where('f', '==', idc)
       .get()
-      .then(qs => new Promise<DocumentData | void>(r => {
-        qs.forEach(v => r(v.data()))
-        r()
-      }))
+      .then(
+        qs =>
+          new Promise<DocumentData | void>(r => {
+            qs.forEach(v => r(v.data()))
+            r()
+          }),
+      )
       .then(res => [res?.t, res?.type])
   }
 
@@ -181,7 +215,9 @@ export class ChannelProxy {
 
   private broadcastProxyChannelError(message: any) {
     const client = this.getClient()
-    client.log(LogLevel.EXTRA, `Event from proxy channel [${this.options.captureChannel} -> ${this.options.destinationChannel}] throw exception: ${message}`)
+    client.log(
+      LogLevel.EXTRA,
+      `Event from proxy channel [${this.options.captureChannel} -> ${this.options.destinationChannel}] throw exception: ${message}`,
+    )
   }
-
 }

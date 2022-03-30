@@ -83,7 +83,7 @@ describe('EmbedParser', () => {
     expect(err).toBeInstanceOf(EmbedParseException)
   })
 
-  it('should generate correct clean message',() => {
+  it('should generate correct clean message', () => {
     const testYml = `
       any message before
       embed\`\`\`yml
@@ -104,7 +104,5 @@ describe('EmbedParser', () => {
       
       any message after
     `)
-
   })
-
 })

@@ -1,5 +1,11 @@
 import { NicordClient } from '../client/NicordClient'
-import { ChannelWebhookCreateOptions, TextBasedChannel, TextChannel, User, Webhook } from 'discord.js'
+import {
+  ChannelWebhookCreateOptions,
+  TextBasedChannel,
+  TextChannel,
+  User,
+  Webhook,
+} from 'discord.js'
 import { NicordClientException } from '../../exceptions/NicordClient.exception'
 import { DocumentData } from 'firebase-admin/firestore'
 import { LogLevel } from '../../utils/NicordTools'
@@ -17,8 +23,7 @@ export class ShadowUser {
   constructor(
     private client: NicordClient,
     private options: ShadowUserOptions,
-  ) {
-  }
+  ) {}
 
   async get(): Promise<Webhook> {
     if (this.webhook) return this.webhook
@@ -51,10 +56,13 @@ export class ShadowUser {
             .where('channelId', '==', channel.id)
             .where('createdBy', '==', this.client.clientId)
             .get()
-            .then(qs => new Promise<DocumentData | void>(r => {
-              qs.forEach(v => r(v.data()))
-              r()
-            }))
+            .then(
+              qs =>
+                new Promise<DocumentData | void>(r => {
+                  qs.forEach(v => r(v.data()))
+                  r()
+                }),
+            )
             .then(res => res?.token)
           const dbFindResult = webhooks.find(w => w.token === token)
           if (dbFindResult) {
@@ -77,7 +85,10 @@ export class ShadowUser {
           channelId: channel.id,
           createdBy: this.client.clientId,
         })
-      this.client.log(LogLevel.EXTRA, `Webhooking [${user.username}#${user.discriminator}/${user.id}] in (${channel.name}/${channel.id})`)
+      this.client.log(
+        LogLevel.EXTRA,
+        `Webhooking [${user.username}#${user.discriminator}/${user.id}] in (${channel.name}/${channel.id})`,
+      )
       return newWebhook
     }
   }

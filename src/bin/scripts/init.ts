@@ -22,7 +22,7 @@ const qs = [
     name: 'project',
     type: 'input',
     message: 'Project name:',
-    validate: function(input) {
+    validate: function (input) {
       if (/^([a-z\-_\d])+$/.test(input)) {
         if (!fs.existsSync(path.join(process.cwd(), input))) return true
         else return 'Project already exists'
@@ -34,7 +34,7 @@ const qs = [
     name: 'token',
     type: 'input',
     message: 'Bot token:',
-    validate: function(input) {
+    validate: function (input) {
       if (/^\w+\.\w+\.\w+$/.test(input)) return true
       else return 'Invalid token'
     },
@@ -99,7 +99,7 @@ export const initProject = async () => {
     case Template.ENTERPRISE:
       console.log(
         chalk.red(
-          '\'Enterprise\' template is in development. Please use another template',
+          "'Enterprise' template is in development. Please use another template",
         ),
       )
       return

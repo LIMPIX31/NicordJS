@@ -29,7 +29,12 @@ export class NicordMessage extends OriginalShadow<Message> {
     return this.original.author
   }
 
-  get channel(): DMChannel | PartialDMChannel | NewsChannel | TextChannel | ThreadChannel {
+  get channel():
+    | DMChannel
+    | PartialDMChannel
+    | NewsChannel
+    | TextChannel
+    | ThreadChannel {
     return this.original.channel
   }
 
@@ -139,7 +144,11 @@ export class NicordMessage extends OriginalShadow<Message> {
   }
 
   copyOptions(handleEmbeds: boolean = false): MessageOptions {
-    return NicordTools.pipeMessage(this.original.client, this.original, handleEmbeds)
+    return NicordTools.pipeMessage(
+      this.original.client,
+      this.original,
+      handleEmbeds,
+    )
   }
 
   get channelId(): string {
@@ -153,5 +162,4 @@ export class NicordMessage extends OriginalShadow<Message> {
   get partial(): boolean {
     return this.original.partial
   }
-
 }

@@ -92,5 +92,5 @@ export {
   ShadowUserOptions,
   EmbedParser,
   EmbedParserResult,
-  LogLevel
+  LogLevel,
 }

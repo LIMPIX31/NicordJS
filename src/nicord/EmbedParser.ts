@@ -11,7 +11,7 @@ export const toCorrectJson = (rjson?: string) =>
   rjson?.replace(/(['"])?([a-z0-9A-Z_]+)(['"])?:/g, '"$2": ')
 
 export type EmbedParserResult = {
-  embeds: MessageEmbed[],
+  embeds: MessageEmbed[]
   clearMessage: string
 }
 
@@ -29,10 +29,7 @@ export const parseRelaxedJson = <T = any>(rjson?: string): T => {
 
 export const EmbedParser = (input: EmbedLike) => {
   const matches = Array.from(input.matchAll(embedFindRegexp))
-  const rawEmbeds = matches.map(v => [
-    v.groups?.format,
-    v.groups?.code,
-  ])
+  const rawEmbeds = matches.map(v => [v.groups?.format, v.groups?.code])
   const embedOptions: MessageEmbedOptions[] = []
   for (const [format, embed] of rawEmbeds) {
     if (format === 'json') {

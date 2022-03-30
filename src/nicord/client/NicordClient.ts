@@ -41,11 +41,17 @@ export class NicordClient extends Client {
   private firebaseApp?: App
   private firestore?: Firestore
   private _debug: boolean = false
-  private middlewares: Record<string, ((...args: any) => Awaitable<void | 'REJECT'>)[]> = {}
+  private middlewares: Record<
+    string,
+    ((...args: any) => Awaitable<void | 'REJECT'>)[]
+  > = {}
   private loglevel?: LogLevel
 
   constructor(
-    private flags: IntentsFlags[] = [IntentsFlags.GUILDS, IntentsFlags.GUILD_MESSAGES],
+    private flags: IntentsFlags[] = [
+      IntentsFlags.GUILDS,
+      IntentsFlags.GUILD_MESSAGES,
+    ],
   ) {
     super({
       intents: flags.includes(IntentsFlags.ALL)
@@ -70,7 +76,12 @@ export class NicordClient extends Client {
   }
 
   log(level: LogLevel, message: string) {
-    NicordTools.log(this._debug, level, message, this.loglevel ?? LogLevel.EXTRA)
+    NicordTools.log(
+      this._debug,
+      level,
+      message,
+      this.loglevel ?? LogLevel.EXTRA,
+    )
   }
 
   get clientId(): string | undefined {
@@ -118,7 +129,11 @@ export class NicordClient extends Client {
 
   async start(onReady?: () => void): Promise<void> {
     console.log(NicordTools.getCredits())
-    if (this.flags.includes(IntentsFlags.ALL)) this.log(LogLevel.WARN, 'Dangerous permission "ALL".\nIf you are using the bot in production,\nwe recommend that you restrict permissions and\nstop using IntentFlags.ALL, as this can create vulnerabilities.\nIf you are developing and testing your bot,\nyou can ignore this message.')
+    if (this.flags.includes(IntentsFlags.ALL))
+      this.log(
+        LogLevel.WARN,
+        'Dangerous permission "ALL".\nIf you are using the bot in production,\nwe recommend that you restrict permissions and\nstop using IntentFlags.ALL, as this can create vulnerabilities.\nIf you are developing and testing your bot,\nyou can ignore this message.',
+      )
     if (this.hasToken) {
       try {
         await this.login(this.nToken)
@@ -139,7 +154,9 @@ export class NicordClient extends Client {
           )
         } else {
           await this.nrest.put(
-            Routes.applicationCommands(this?.application?.id || this?._clientId || ''),
+            Routes.applicationCommands(
+              this?.application?.id || this?._clientId || '',
+            ),
             {
               body: this.slashCommands,
             },
@@ -195,7 +212,6 @@ export class NicordClient extends Client {
     }
   }
 
-
   registerButton(id: string, onClick: ButtonOnclickType): void {
     this.log(LogLevel.EXTRA, `Registered button with id: ${id}`)
     if (!this.activeButtons.find(v => v.id === id))
@@ -243,7 +259,6 @@ export class NicordClient extends Client {
     })
   }
 
-
   private invalidCommandListenerException() {
     return new NicordClientException(
       'Value must be valid command listener. Check if you are using the right decorator.',
@@ -271,23 +286,42 @@ export class NicordClient extends Client {
       this.firestore = getFirestore(this.getFirebase())
       if (!this.firestore) {
         this.log(LogLevel.ERROR, 'Firebase required!')
-        this.log(LogLevel.ERROR, 'Part of your application requires Firebase, the configuration of which has not been provided.')
+        this.log(
+          LogLevel.ERROR,
+          'Part of your application requires Firebase, the configuration of which has not been provided.',
+        )
         process.kill(process.pid, 'SIGINT')
       }
       return this.firestore
     }
   }
 
-  nion<K extends keyof NicordClientEvents>(event: K, listener: (...args: NicordClientEvents[K]) => Awaitable<void>): () => void {
-    const l = NicordTools.wrapEventListener(event, this, this.middlewares[event] ?? [], listener)
+  nion<K extends keyof NicordClientEvents>(
+    event: K,
+    listener: (...args: NicordClientEvents[K]) => Awaitable<void>,
+  ): () => void {
+    const l = NicordTools.wrapEventListener(
+      event,
+      this,
+      this.middlewares[event] ?? [],
+      listener,
+    )
     super.on(event, l)
     return () => {
       super.off(event, l)
     }
   }
 
-  nionce<K extends keyof NicordClientEvents>(event: K, listener: (...args: NicordClientEvents[K]) => Awaitable<void>): () => void {
-    const l = NicordTools.wrapEventListener(event, this, this.middlewares[event] ?? [], listener)
+  nionce<K extends keyof NicordClientEvents>(
+    event: K,
+    listener: (...args: NicordClientEvents[K]) => Awaitable<void>,
+  ): () => void {
+    const l = NicordTools.wrapEventListener(
+      event,
+      this,
+      this.middlewares[event] ?? [],
+      listener,
+    )
     super.once(event, l)
     return () => {
       super.off(event, l)
@@ -302,8 +336,10 @@ export class NicordClient extends Client {
     return NicordTools.transpileEmojis(this, emojiString)
   }
 
-  useMiddleware<K extends keyof NicordClientEvents>(event: K, listener: (...args: NicordClientEvents[K]) => Awaitable<void | 'REJECT'>) {
+  useMiddleware<K extends keyof NicordClientEvents>(
+    event: K,
+    listener: (...args: NicordClientEvents[K]) => Awaitable<void | 'REJECT'>,
+  ) {
     this.middlewares[event] = [...(this.middlewares[event] ?? []), listener]
   }
-
 }

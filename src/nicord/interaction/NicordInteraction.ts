@@ -6,8 +6,9 @@ import { NicordButtonInteraction } from './NicordButtonInteraction'
 import { NicordContextMenuInteraction } from './NicordContextMenuInteraction'
 import { NicordSelectMenuInteraction } from './NicordSelectMenuInteraction'
 
-export class NicordInteraction<T extends Interaction,
-  > extends OriginalShadow<T> {
+export class NicordInteraction<
+  T extends Interaction,
+> extends OriginalShadow<T> {
   get user(): User {
     return this.original.user
   }
@@ -46,5 +47,4 @@ export class NicordInteraction<T extends Interaction,
   static from(interaction: Interaction) {
     return new NicordInteraction(interaction)
   }
-
 }
