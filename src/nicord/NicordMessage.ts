@@ -3,17 +3,22 @@
  */
 import {
   Collection,
+  DMChannel,
   EmojiIdentifierResolvable,
   Guild,
   GuildMember,
   Message,
   MessageActionRow,
   MessageAttachment,
-  MessageEmbed, MessageOptions,
+  MessageEmbed,
+  MessageOptions,
   MessagePayload,
   MessageReaction,
+  NewsChannel,
+  PartialDMChannel,
   ReplyMessageOptions,
-  TextBasedChannel,
+  TextChannel,
+  ThreadChannel,
   User,
 } from 'discord.js'
 import { OriginalShadow } from '../utils/OriginalShadow'
@@ -24,7 +29,7 @@ export class NicordMessage extends OriginalShadow<Message> {
     return this.original.author
   }
 
-  get channel(): TextBasedChannel {
+  get channel(): DMChannel | PartialDMChannel | NewsChannel | TextChannel | ThreadChannel {
     return this.original.channel
   }
 
