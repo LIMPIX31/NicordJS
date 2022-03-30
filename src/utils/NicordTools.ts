@@ -18,6 +18,8 @@ import { NicordSelectMenuInteraction } from '../nicord/interaction/NicordSelectM
 import { NicordContextMenuInteraction } from '../nicord/interaction/NicordContextMenuInteraction'
 import { NicordInteraction } from '../nicord/interaction/NicordInteraction'
 import { NicordClientEvents } from '../nicord/client/NicordClientEvents'
+import { NicordClient } from '../nicord/client/NicordClient'
+import * as chalk from 'chalk'
 
 export abstract class NicordTools {
   static isCommandListener(Listener: CommandListener) {
@@ -96,8 +98,16 @@ export abstract class NicordTools {
     return args
   }
 
-  static wrapEventListener<K extends keyof ClientEvents>(listener: (...args: NicordClientEvents[K]) => Awaitable<void>): (...args: ClientEvents[K]) => Awaitable<void> {
+  static wrapEventListener<K extends keyof ClientEvents>(event: K, client: NicordClient, middlewares: ((...args: NicordClientEvents[K]) => Awaitable<void | 'REJECT'>)[], listener: (...args: NicordClientEvents[K]) => Awaitable<void>): (...args: ClientEvents[K]) => Awaitable<void> {
     return (...args) => {
+      for (const mid of middlewares) {
+        try {
+          if (mid(...NicordTools.handleDJSEventArgs(...args) as NicordClientEvents[K]) === 'REJECT') return
+        } catch (e) {
+          client.log(chalk.red(`One of middlewares for ${event} throw an error:\n${e}`))
+          return
+        }
+      }
       listener(...NicordTools.handleDJSEventArgs(...args) as NicordClientEvents[K])
     }
   }

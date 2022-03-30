@@ -41,6 +41,7 @@ export class NicordClient extends Client {
   private firebaseApp?: App
   private firestore?: Firestore
   private _debug: boolean = false
+  private middlewares: Record<string, ((...args: any) => Awaitable<void | 'REJECT'>)[]> = {}
 
   constructor(
     flags: IntentsFlags[] = [IntentsFlags.GUILDS, IntentsFlags.GUILD_MESSAGES],
@@ -263,7 +264,7 @@ export class NicordClient extends Client {
   }
 
   nion<K extends keyof NicordClientEvents>(event: K, listener: (...args: NicordClientEvents[K]) => Awaitable<void>): () => void {
-    const l = NicordTools.wrapEventListener(listener)
+    const l = NicordTools.wrapEventListener(event, this, this.middlewares[event] ?? [], listener)
     super.on(event, l)
     return () => {
       super.off(event, l)
@@ -271,7 +272,7 @@ export class NicordClient extends Client {
   }
 
   nionce<K extends keyof NicordClientEvents>(event: K, listener: (...args: NicordClientEvents[K]) => Awaitable<void>): () => void {
-    const l = NicordTools.wrapEventListener(listener)
+    const l = NicordTools.wrapEventListener(event, this, this.middlewares[event] ?? [], listener)
     super.once(event, l)
     return () => {
       super.off(event, l)
@@ -291,6 +292,10 @@ export class NicordClient extends Client {
     for (let i = 0; i < rawEmojis.length; i++)
       if (transpiled[i]) emojiString = emojiString.replaceAll(rawEmojis[i], transpiled[i] ?? '')
     return emojiString
+  }
+
+  useMiddleware<K extends keyof NicordClientEvents>(event: K, listener: (...args: NicordClientEvents[K]) => Awaitable<void | 'REJECT'>) {
+    this.middlewares[event] = [...(this.middlewares[event] ?? []), listener]
   }
 
 }
