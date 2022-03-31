@@ -241,7 +241,7 @@ export class NicordClient extends Client {
         }
       }
     })
-    this.nionce('interactionCreate', async interaction => {
+    this.nion('interactionCreate', async interaction => {
       if (interaction.isCommand()) {
         for (const listener of this.commandListeners) {
           if (NicordTools.isSlashListener(listener)) {
